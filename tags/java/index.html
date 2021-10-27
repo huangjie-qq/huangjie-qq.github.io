@@ -9,7 +9,7 @@
     
     <title>
         
-            利用反射+自定义注解 实现各种Bean之间的轻松转换 |
+            标签: java |
         
         小球某的博客
     </title>
@@ -117,142 +117,42 @@
 
                 
                     <div class="fade-in-down-animation">
-    <div class="article-content-container">
-
-        <div class="article-title">
-            <span class="title-hover-animation">利用反射+自定义注解 实现各种Bean之间的轻松转换</span>
+    <div class="tag-container">
+        <div class="tag-name"><i class="fas fa-tag"></i>&nbsp;java
         </div>
-
-        
-            <div class="article-header">
-                <div class="avatar">
-                    <img src="/images/itang.svg">
-                </div>
-                <div class="info">
-                    <div class="author">
-                        <span class="name">小球某</span>
-                        
-                            <span class="author-label">Lv1</span>
-                        
-                    </div>
-                    <div class="meta-info">
-                        <div class="article-meta-info">
-    <span class="article-date article-meta-item">
-        <i class="fas fa-edit"></i>&nbsp;2021-10-26 23:46:54
-    </span>
+        <div class="tag-post-list">
+            
+<div class="archive-list-container">
     
-    
-        <span class="article-tags article-meta-item">
-            <i class="fas fa-tags"></i>&nbsp;
-            <ul>
+        <section class="archive-item">
+            <div class="archive-item-header">
+                <span class="archive-year">2021</span>
+                <span class="archive-year-post-count">[1]</span>
+            </div>
+            <ul class="article-list">
                 
-                    <li>
-                        <a href="/tags/java/">java</a>&nbsp;
+                    <li class="article-item">
+                        <a class="article-title"
+                           href="/2021/10/26/demo2/"
+                        >利用反射+自定义注解 实现各种Bean之间的轻松转换</a>
+                        <span class="article-date">10-26</span>
                     </li>
                 
             </ul>
-        </span>
-    
-
-    
-    
-    
+        </section>
     
 </div>
 
-                    </div>
-                </div>
-            </div>
-        
-
-        <div class="article-content markdown-body">
-            <h1 id="Bean转换工具类"><a href="#Bean转换工具类" class="headerlink" title="Bean转换工具类"></a>Bean转换工具类</h1><h3 id="默认按照字列名相同转换-不同时通过-Copy注解指定列名"><a href="#默认按照字列名相同转换-不同时通过-Copy注解指定列名" class="headerlink" title="默认按照字列名相同转换 不同时通过@Copy注解指定列名"></a>默认按照字列名相同转换 不同时通过@Copy注解指定列名</h3><ul>
-<li>CopyUtils类：提供Bean转换方法<br></li>
-<li>@Copy注解： 用于映射列名不一样<br></li>
-<li>@Exclude注解：用于取消字段的映射 默认为true<br></li>
-</ul>
-<h2 id="Api说明："><a href="#Api说明：" class="headerlink" title="Api说明："></a>Api说明：</h2><ul>
-<li>单个Bean转换 :  T copy(Object source,Class<T> targetClass)<br></li>
-<li>多个Bean转换 : List copy(List sourceList,Class<T> targetClass)<br></li>
-<li>map转Bean   :  T toBean(Map&lt;String,Object&gt; map,Class<T> targetClass)<br></li>
-<li>Bean转Map   :  Map&lt;String,Object&gt; toMap(Object target)<br></li>
-</ul>
-<h2 id="注解用法"><a href="#注解用法" class="headerlink" title="注解用法"></a>注解用法</h2><pre><code>   @Data
-   public class User &#123;
-    
-    private String name;
-    
-    private Integer age;
-    
-   &#125;
- 
-   @Data
-   @Builder
-   public class UserVo &#123;
-    
-    @Copy(&quot;name&quot;)//指定要转换的列名
-    private String nameVo;
-    
-    private Integer age;
-    
-    @Exclude//排除该字段 默认为true
-    private String sex;
-    
-   &#125;
-   
-</code></pre>
-<h2 id="👉🏻快速开始"><a href="#👉🏻快速开始" class="headerlink" title="👉🏻快速开始"></a>👉🏻快速开始</h2><pre><code>   public static void main(String[] args) &#123;
-        
-        //单个Bean转换
-        UserVo userVo = UserVo.builder().nameVo(&quot;小球某&quot;).age(3).sex(&quot;男&quot;).build();
-        User user = CopyUtils.copy(userVo, User.class);
-        
-        //多个Bean转换
-        UserVo userVo1 = UserVo.builder().nameVo(&quot;张三&quot;).age(18).sex(&quot;男&quot;).build();
-        UserVo userVo2 = UserVo.builder().nameVo(&quot;李四&quot;).age(22).sex(&quot;男&quot;).build();
-        List&lt;UserVo&gt; userVoList = Arrays.asList(userVo1, userVo2);
-        List&lt;User&gt; userList = CopyUtils.copy(userVoList, User.class);
-        
-        //map转Bean
-        Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();
-        map.put(&quot;name&quot;,&quot;小球某&quot;);
-        map.put(&quot;age&quot;,20);
-        User user = CopyUtils.toBean(map, User.class);
-        
-        //Bean转Map
-        Map&lt;String, Object&gt; map = CopyUtils.toMap(user);
-    &#125;
-   
-</code></pre>
-<h1 id="好用的同学💁🏻-点个星呗"><a href="#好用的同学💁🏻-点个星呗" class="headerlink" title="好用的同学💁🏻 点个星呗"></a>好用的同学💁🏻 点个星呗</h1><p><a class="link"   target="_blank" rel="noopener" href="https://github.com/huangjie-qq/xqm-copy-utils" >地址<i class="fas fa-external-link-alt"></i></a></p>
-
         </div>
+    </div>
 
-        
+    <div class="tag-paginator">
+        <div class="paginator">
+    
 
-        
-            <div class="article-nav">
-                
-                    <div class="article-prev">
-                        <a class="prev"
-                           rel="prev"
-                           href="/2021/10/27/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8B%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/"
-                        >
-                            <span class="left arrow-icon flex-center">
-                              <i class="fas fa-chevron-left"></i>
-                            </span>
-                            <span class="title flex-center">
-                                <span class="post-nav-title-item">设计模式之建造者模式</span>
-                                <span class="post-nav-item">上一篇</span>
-                            </span>
-                        </a>
-                    </div>
-                
-                
-            </div>
-        
+    
+</div>
 
-        
     </div>
 </div>
 
@@ -285,19 +185,6 @@
         </div>
     </div>
 
-    
-        <div class="post-tools">
-            <div class="post-tools-container">
-    <ul class="tools-list">
-        <!-- TOC aside toggle -->
-        
-
-        <!-- go comment -->
-        
-    </ul>
-</div>
-
-        </div>
     
 
     <div class="right-bottom-side-tools">
