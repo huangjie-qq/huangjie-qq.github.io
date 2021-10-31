@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="Hexo Theme Keep">
+    <meta name="author" content="小球某">
+    
+    <title>
+        
+            简单实现单点登录 |
+        
+        小球某的博客
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/itang.svg">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"example.com","root":"/","language":"zh-CN"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/itang.svg","favicon":"/images/itang.svg","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":true,"background_img":"/images/bg.svg","description":"一只爱偷吃的猫"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":true}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.3"};
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 月前","year":"%s 年前"};
+  </script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+        <span class="scroll-progress-bar"></span>
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                小球某的博客
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                首页
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                文章
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">首页</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">文章</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">简单实现单点登录</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/itang.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">小球某</span>
+                        
+                            <span class="author-label">Lv1</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;2021-10-31 00:51:56
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/java/">java</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fas fa-file-word"></i>&nbsp;<span>2k 字</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fas fa-clock"></i>&nbsp;<span>10 分钟</span>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fas fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>什么是单点登陆 ？</p>
+<p>用简单的话来讲就是 多个系统  一处登陆 处处登陆</p>
+<h3 id="创建项目maven项目"><a href="#创建项目maven项目" class="headerlink" title="创建项目maven项目"></a>创建项目maven项目</h3><ul>
+<li>认证中心<br></li>
+<li>服务一<br></li>
+<li>服务二<br></li>
+</ul>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/QQ%E5%9B%BE%E7%89%8720211030234338.png" alt="avatar"></p>
+<p>所有模块引入以下依赖</p>
+<pre><code class="java"> &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;!--thymeleaf--&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-thymeleaf&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;!--redis缓存引入 --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-data-redis&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;!--lombok--&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+            &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+            &lt;version&gt;1.16.20&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;!--fastjson--&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;com.alibaba&lt;/groupId&gt;
+            &lt;artifactId&gt;fastjson&lt;/artifactId&gt;
+            &lt;version&gt;1.2.41&lt;/version&gt;
+        &lt;/dependency&gt;
+ &lt;/dependencies&gt;
+</code></pre>
+<p>认证中心配置如下：</p>
+<pre><code class="java"># 应用名称
+spring.application.name=attestation
+server.port=8000
+
+# Redis服务器地址
+spring.redis.host=127.0.0.1
+# Redis服务器连接端口
+spring.redis.port=6379
+</code></pre>
+<p>client1配置如下：</p>
+<pre><code># 应用名称
+spring.application.name=client1
+server.port=8100
+
+# Redis服务器地址
+spring.redis.host=127.0.0.1
+# Redis服务器连接端口
+spring.redis.port=6379
+</code></pre>
+<p>client2配置如下：</p>
+<pre><code># 应用名称
+spring.application.name=client2
+server.port=8200
+
+# Redis服务器地址
+spring.redis.host=127.0.0.1
+# Redis服务器连接端口
+spring.redis.port=6379
+
+</code></pre>
+<p>为了演示不同域名之间的登录 修改本地hosts文件（文件目录在C:\Windows\System32\drivers\etc）</p>
+<pre><code>127.0.0.1 attestation.com
+
+127.0.0.1 client1
+
+127.0.0.1 client2
+</code></pre>
+<p>在client1中  编写认证成功后才能访问的页面</p>
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns:th=&quot;http://www.thymeleaf.org&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;Title&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;SSO-服务一 认证成功&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>在client1编写一个简单的Controller</p>
+<pre><code class="java">/**
+ * @Author：小球某
+ * @Date：2021/10/31/0:03
+ */
+@Controller
+public class indexnController &#123;
+
+    @GetMapping(&quot;list&quot;)
+    public String list()&#123;
+        return &quot;list&quot;;
+    &#125;
+
+&#125;
+</code></pre>
+<p>通过浏览器 访问：<a class="link"   target="_blank" rel="noopener" href="http://client1:8100/list" >http://client1:8100/list<i class="fas fa-external-link-alt"></i></a>  结果如下</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/03314.png" alt="avatar"></p>
+<p>这个时候就要编写我们的认证逻辑 ，需要判断是否登录。</p>
+<p>正常通过session来判断用户是否登录 ，登录正常访问，未登录就重定向到我们的认证中心去。</p>
+<h4 id="编写认证中心-登录页面和Controller"><a href="#编写认证中心-登录页面和Controller" class="headerlink" title="编写认证中心 登录页面和Controller"></a>编写认证中心 登录页面和Controller</h4><pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns:th=&quot;http://www.thymeleaf.org&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;title&gt;Title&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;SSO-认证中心&lt;/h1&gt;
+&lt;form method=&quot;post&quot; action=&quot;&quot;&gt;
+    账号：&lt;input name=&quot;userName&quot; type=&quot;text&quot;&gt;&lt;br&gt;
+    密码：&lt;input name=&quot;password&quot; type=&quot;text&quot;&gt;&lt;br&gt;
+    登陆 &lt;input type=&quot;submit&quot;&gt;
+    &lt;input type=&quot;hidden&quot; name=&quot;url&quot;&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<pre><code class="java">@Controller
+public class LoginController &#123;
+
+    /**
+     * 跳转到登录视图
+     * @return
+     */
+    @GetMapping(&quot;login.html&quot;)
+    public String loginPage()&#123;
+        return &quot;login&quot;;
+    &#125;
+
+    /**
+     * 处理登录逻辑
+     * @param user
+     * @return
+     */
+    @PostMapping(&quot;doLogin&quot;)
+    public String dolgoin(User user)&#123;
+        return null;
+    &#125;
+
+&#125;
+</code></pre>
+<pre><code class="java">  @Data
+  public class User implements Serializable&#123;
+     private String userName;
+     private String password;
+  &#125;
+</code></pre>
+<p>client1代码 改动如下：</p>
+<pre><code class="java">    @GetMapping(&quot;list&quot;)
+    public String list(HttpSession session)&#123;
+        if(session.getAttribute(&quot;loginUser&quot;)==null)
+            return &quot;redirect:http://attestation.com:8000/login.html&quot;;
+        return &quot;list&quot;;
+    &#125;
+</code></pre>
+<p>请求流程变成这样：</p>
+<p>client1:8100/list —-》attestation.com:8000/login.html  —-》登录认证后  —-》attestation.com:8000/doLogin</p>
+<p>那么问题来了 当认证中心的dolgoin请求处理完成以后 要跳转到那里去呢？</p>
+<p>正常应该是跳转到client1:8100/list 中去 那么怎么才能正常跳转。</p>
+<h5 id="可以在client1中跳转login-html请求的时候携带一个redirect-ur1参数，login-html请求接收这个URL，并将这个参数隐藏在前端，-提交dolgoin请求的时候传递这个URL即可。"><a href="#可以在client1中跳转login-html请求的时候携带一个redirect-ur1参数，login-html请求接收这个URL，并将这个参数隐藏在前端，-提交dolgoin请求的时候传递这个URL即可。" class="headerlink" title="可以在client1中跳转login.html请求的时候携带一个redirect_ur1参数，login.html请求接收这个URL，并将这个参数隐藏在前端， 提交dolgoin请求的时候传递这个URL即可。"></a>可以在client1中跳转login.html请求的时候携带一个redirect_ur1参数，login.html请求接收这个URL，并将这个参数隐藏在前端， 提交dolgoin请求的时候传递这个URL即可。</h5><p>client1中代码改动如下：</p>
+<pre><code class="java"> @GetMapping(&quot;list&quot;)
+    public String list(HttpSession session)&#123;
+        if(session.getAttribute(&quot;loginUser&quot;)==null)
+            return &quot;redirect:http://attestation.com:8000/login.html?redirect_ur1=http://client1:8100/list&quot;;
+        return &quot;list&quot;;
+    &#125;
+</code></pre>
+<p>login请求改动如下：</p>
+<pre><code class="java">    @GetMapping(&quot;login.html&quot;)
+    public String loginPage(@RequestParam(&quot;redirect_ur1&quot;) String url, Model model)&#123;
+        model.addAttribute(&quot;url&quot;,url);
+        return &quot;login&quot;;
+    &#125;
+</code></pre>
+<p>页面改动如下：</p>
+<pre><code class="html">&lt;form method=&quot;post&quot; action=&quot;doLogin&quot;&gt;
+    账号：&lt;input name=&quot;userName&quot; type=&quot;text&quot;&gt;&lt;br&gt;
+    密码：&lt;input name=&quot;password&quot; type=&quot;text&quot;&gt;&lt;br&gt;
+    &lt;input type=&quot;hidden&quot; name=&quot;url&quot; th:value=&quot;$&#123;url&#125;&quot;&gt;
+    登陆 &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+<p>为了方便就将URL这个参数添加到User中去</p>
+<pre><code class="java">  @Data
+  public class User implements Serializable&#123;
+     private String userName;
+     private String password;
+     private String url;
+  &#125;
+</code></pre>
+<p>这个时候dolgoin请求就可以正常的跳转回去了</p>
+<pre><code class="java">    @PostMapping(&quot;doLogin&quot;)
+    public String dolgoin(User user, HttpSession session)&#123;
+        session.setAttribute(&quot;loginUser&quot;,user);
+        return &quot;redirect:&quot;+user.getUrl();
+    &#125;
+</code></pre>
+<p>改动完代码以后 并登陆后运行结果如下：</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/058.png" alt="avatar"></p>
+<h5 id="明明登陆了-为什么还是会跳转到认证中心呢"><a href="#明明登陆了-为什么还是会跳转到认证中心呢" class="headerlink" title="明明登陆了 为什么还是会跳转到认证中心呢"></a>明明登陆了 为什么还是会跳转到认证中心呢</h5><p>原因如下：在list请求中我们是通过session来判断是否登录， 虽然在认证中心登录， 但认证中心存的session</p>
+<p> client1是取不到  所以就会重新跳转到认证中心去。</p>
+<h5 id="这个时候我们可以换一个思路，将认证中心存放的session-放入Redis中"><a href="#这个时候我们可以换一个思路，将认证中心存放的session-放入Redis中" class="headerlink" title="这个时候我们可以换一个思路，将认证中心存放的session 放入Redis中"></a>这个时候我们可以换一个思路，将认证中心存放的session 放入Redis中</h5><h5 id="并将存入时放的key-在重定向的时候携带给client1-，-client1-中接收这个key来判断即可。"><a href="#并将存入时放的key-在重定向的时候携带给client1-，-client1-中接收这个key来判断即可。" class="headerlink" title="并将存入时放的key 在重定向的时候携带给client1 ， client1 中接收这个key来判断即可。"></a>并将存入时放的key 在重定向的时候携带给client1 ， client1 中接收这个key来判断即可。</h5><h5 id="认证中心代码变化如下："><a href="#认证中心代码变化如下：" class="headerlink" title="认证中心代码变化如下："></a>认证中心代码变化如下：</h5><pre><code class="java">    @Resource
+    private RedisTemplate redisTemplate;
+
+    @PostMapping(&quot;doLogin&quot;)
+    public String dolgoin(User user)&#123;
+        String token= UUID.randomUUID().toString().replace(&quot;-&quot;,&quot;&quot;);
+        redisTemplate.opsForValue().set(token,JSON.toJSONString(user),30, TimeUnit.MINUTES);
+        return &quot;redirect:&quot;+user.getUrl()+&quot;?token=&quot;+token;
+    &#125;
+</code></pre>
+<h5 id="client1代码变化如下："><a href="#client1代码变化如下：" class="headerlink" title="client1代码变化如下："></a>client1代码变化如下：</h5><pre><code class="java">    @Resource
+    private RedisTemplate redisTemplate;
+
+    @GetMapping(&quot;list&quot;)
+    public String list(@RequestParam(value = &quot;token&quot;,required = false) String token, HttpSession session)&#123;
+        if(!StringUtils.isEmpty(token))&#123;
+            String json = (String) redisTemplate.opsForValue().get(token);
+            User loginUser = JSON.parseObject(json, User.class);
+            if(loginUser!=null)
+                session.setAttribute(&quot;loginUser&quot;,loginUser);
+        &#125;
+        if(session.getAttribute(&quot;loginUser&quot;)==null)
+            return &quot;redirect:http://attestation.com:8000/login.html?redirect_ur1=http://client1:8100/list&quot;;
+        return &quot;list&quot;;
+    &#125;
+</code></pre>
+<p>为了看到认证后的效果 修改client1中HTML代码</p>
+<pre><code class="html">&lt;body&gt;
+&lt;h1&gt;SSO-服务一 认证成功&lt;/h1&gt;
+&lt;h1&gt;登录信息如下&lt;/h1&gt;
+&lt;h1 th:text=&quot;$&#123;session.loginUser==null?&#39;账号：未登录&#39;:&#39;账号：&#39;+session.loginUser.userName&#125;&quot;&gt;&lt;/h1&gt;
+&lt;h1 th:text=&quot;$&#123;session.loginUser==null?&#39;密码：未登录&#39;:&#39;密码：&#39;+session.loginUser.password&#125;&quot;&gt;&lt;/h1&gt;
+&lt;/body&gt;
+</code></pre>
+<p>运行结果如下：访问<a class="link"   target="_blank" rel="noopener" href="http://client1:8100/list" >http://client1:8100/list<i class="fas fa-external-link-alt"></i></a> </p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/52.png" alt="avatar"></p>
+<p>正常跳转到认证中心 登录后 正常显示</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/27.png" alt="avatar"></p>
+<p>这个时候我们把client1代码复制给client2，并修改重定向redirect_ur1参数变成client2的地址</p>
+<pre><code class="java">@GetMapping(&quot;list&quot;)
+    public String list(@RequestParam(value = &quot;token&quot;,required = false) String token, HttpSession session)&#123;
+        if(!StringUtils.isEmpty(token))&#123;
+            String json = (String) redisTemplate.opsForValue().get(token);
+            User loginUser = JSON.parseObject(json, User.class);
+            if(loginUser!=null)
+                session.setAttribute(&quot;loginUser&quot;,loginUser);
+        &#125;
+        if(session.getAttribute(&quot;loginUser&quot;)==null)
+            return &quot;redirect:http://attestation.com:8000/login.html?redirect_ur1=http://client2:8200/list&quot;;
+        return &quot;list&quot;;
+    &#125;
+</code></pre>
+<p> 启动起来 访问：<a class="link"   target="_blank" rel="noopener" href="http://client2:8200/list" >http://client2:8200/list<i class="fas fa-external-link-alt"></i></a></p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/26.png" alt="avatar"></p>
+<h5 id="为什么是还是会跳转到认证中心去-在client1中不是登录了吗"><a href="#为什么是还是会跳转到认证中心去-在client1中不是登录了吗" class="headerlink" title="为什么是还是会跳转到认证中心去 在client1中不是登录了吗"></a>为什么是还是会跳转到认证中心去 在client1中不是登录了吗</h5><p>分析代码：首先会判断token 我们没有token 然后会判断session 这个时候也没有 所以会重定向到认证中心去 </p>
+<h5 id="这个时候我们可以在dolgoin请求登录后，在存入Redis的同时，在Cookie中也同时保存一份信息，并且在loginPage请求中判断是否有Cookie-如果有则证明有人登录过-直接跳转回去即可。"><a href="#这个时候我们可以在dolgoin请求登录后，在存入Redis的同时，在Cookie中也同时保存一份信息，并且在loginPage请求中判断是否有Cookie-如果有则证明有人登录过-直接跳转回去即可。" class="headerlink" title="这个时候我们可以在dolgoin请求登录后，在存入Redis的同时，在Cookie中也同时保存一份信息，并且在loginPage请求中判断是否有Cookie 如果有则证明有人登录过 直接跳转回去即可。"></a>这个时候我们可以在dolgoin请求登录后，在存入Redis的同时，在Cookie中也同时保存一份信息，并且在loginPage请求中判断是否有Cookie 如果有则证明有人登录过 直接跳转回去即可。</h5><p>认证中心代码变化如下：</p>
+<pre><code class="java">   /**
+     * 处理登录请求
+     * @param user
+     * @param response
+     * @return
+     */
+    @PostMapping(&quot;doLogin&quot;)
+    public String dolgoin(User user, HttpServletResponse response)&#123;
+        String token= UUID.randomUUID().toString().replace(&quot;-&quot;,&quot;&quot;);
+        redisTemplate.opsForValue().set(token,JSON.toJSONString(user),30, TimeUnit.MINUTES);
+        Cookie cookie = new Cookie(&quot;sso_token&quot;, token);
+        response.addCookie(cookie);
+        return &quot;redirect:&quot;+user.getUrl()+&quot;?token=&quot;+token;
+    &#125;
+
+    /**
+     * 跳转到登录视图
+     * @param url
+     * @param model 
+     * @param token  
+     * @return
+     */
+    @GetMapping(&quot;login.html&quot;)
+    public String loginPage(@RequestParam(&quot;redirect_ur1&quot;) String url, Model model,
+                            @CookieValue(value = &quot;sso_token&quot;,required = false) String token)&#123;
+        if(!StringUtils.isEmpty(token))&#123;
+            return &quot;redirect:&quot;+url+&quot;?token=&quot;+token;
+        &#125;
+        model.addAttribute(&quot;url&quot;,url);
+        return &quot;login&quot;;
+    &#125;
+</code></pre>
+<p>最后运行client2 访问：<a class="link"   target="_blank" rel="noopener" href="http://client2:8200/list" >http://client2:8200/list<i class="fas fa-external-link-alt"></i></a></p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/34.png" alt="avatar"></p>
+<p>​     代码地址：<a class="link"   target="_blank" rel="noopener" href="https://github.com/huangjie-qq/sso" >https://github.com/huangjie-qq/sso<i class="fas fa-external-link-alt"></i></a></p>
+
+        </div>
+
+        
+
+        
+            <div class="article-nav">
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2021/10/27/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E4%B9%8B%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">设计模式之建造者模式</span>
+                                <span class="post-nav-item">下一篇</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+            <div class="comment-container">
+                <div class="comments-container">
+    <div id="comment-anchor"></div>
+    <div class="comment-area-title">
+        <i class="fas fa-comments">&nbsp;评论</i>
+    </div>
+    
+
+        
+            
+    <div class="valine-container">
+        <script 
+                src="//cdn.jsdelivr.net/npm/valine@latest/dist/Valine.min.js"></script>
+        <div id="vcomments"></div>
+        <script >
+            function loadValine() {
+                new Valine({
+                    el: '#vcomments',
+                    appId: '7nVegzByflMPenl1NTSoUmDj-gzGzoHsz',
+                    appKey: 'YxcFTbLd95Y2xVFTnL9HwcFL',
+                    meta: ['nick', 'mail', 'link'],
+                    avatar: 'wavatar',
+                    enableQQ: true,
+                    placeholder: '😜 尽情吐槽吧~',
+                    lang: 'zh-CN'.toLowerCase()
+                });
+
+                function getAuthor(language) {
+                    switch (language) {
+                        case 'en':
+                            return 'Author';
+                        case 'zh-CN':
+                            return '博主';
+                        default:
+                            return 'Master';
+                    }
+                }
+
+                // Add "Author" identify
+                const getValineDomTimer = setInterval(() => {
+                    const vcards = document.querySelectorAll('#vcomments .vcards .vcard');
+                    if (vcards.length > 0) {
+                        let author = '小球某';
+
+                        if (author) {
+                            for (let vcard of vcards) {
+                                const vnick_dom = vcard.querySelector('.vhead .vnick');
+                                const vnick = vnick_dom.innerHTML;
+                                if (vnick === author) {
+                                    vnick_dom.innerHTML = `${vnick} <span class="author">${getAuthor(KEEP.hexo_config.language)}</span>`
+                                }
+                            }
+                        }
+                        clearInterval(getValineDomTimer);
+                    } else {
+                        clearInterval(getValineDomTimer);
+                    }
+                }, 2000);
+            }
+
+            if ('false') {
+                const loadValineTimeout = setTimeout(() => {
+                    loadValine();
+                    clearTimeout(loadValineTimeout);
+                }, 1000);
+            } else {
+                window.addEventListener('DOMContentLoaded', loadValine);
+            }
+        </script>
+    </div>
+
+
+
+        
+    
+</div>
+
+            </div>
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2021&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">小球某</a>
+        </div>
+        
+            <script async  src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv">
+                        访问人数&nbsp;<span id="busuanzi_value_site_uv"></span>&ensp;
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv">
+                        总访问量&nbsp;<span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="theme-info info-item">
+            由 <a target="_blank" href="https://hexo.io">Hexo</a> 驱动&nbsp;|&nbsp;主题&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.3</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+            <li class="go-comment">
+                <i class="fas fa-comment"></i>
+            </li>
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="arrow-up fas fa-arrow-up"></i>
+                <span class="percent"></span>
+            </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>
