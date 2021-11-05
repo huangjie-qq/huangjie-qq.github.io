@@ -163,7 +163,7 @@
     
     
         <span class="article-wordcount article-meta-item">
-            <i class="fas fa-file-word"></i>&nbsp;<span>1.3k 字</span>
+            <i class="fas fa-file-word"></i>&nbsp;<span>1.4k 字</span>
         </span>
     
     
@@ -370,7 +370,8 @@ public class Consumer implements Runnable&#123;
 <p>7步：t3又被调度  判断状态位  休眠  （休眠：t1 t2  t3）</p>
 <p>8步：只有t4存活 得到调度 判断状态位 休眠  （休眠：t1  t2 t3  t4）</p>
 <p>至此所以线程全部到了休眠状态 也没有其他线程会唤醒</p>
-<h5 id="解决办法-使用lock-notifyAll"><a href="#解决办法-使用lock-notifyAll" class="headerlink" title="解决办法 使用lock.notifyAll();"></a>解决办法 使用lock.notifyAll();</h5><h5 id="总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断-，要不然可能会造成-一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll-要不然可能会造成全部进入休眠状态-导致程序无法运行。当然这只是生产者-消费者的一种实现方法-还有其他多种实现方法。"><a href="#总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断-，要不然可能会造成-一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll-要不然可能会造成全部进入休眠状态-导致程序无法运行。当然这只是生产者-消费者的一种实现方法-还有其他多种实现方法。" class="headerlink" title="总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断 ，要不然可能会造成 一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll() ,要不然可能会造成全部进入休眠状态 导致程序无法运行。当然这只是生产者 消费者的一种实现方法 还有其他多种实现方法。"></a>总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断 ，要不然可能会造成 一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll() ,要不然可能会造成全部进入休眠状态 导致程序无法运行。当然这只是生产者 消费者的一种实现方法 还有其他多种实现方法。</h5>
+<h5 id="解决办法-使用lock-notifyAll"><a href="#解决办法-使用lock-notifyAll" class="headerlink" title="解决办法 使用lock.notifyAll();"></a>解决办法 使用lock.notifyAll();</h5><h5 id="总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断-，要不然可能会造成-一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll-要不然可能会造成全部进入休眠状态-导致程序无法运行。当然这只是生产者-消费者的一种实现方法-还有其他多种实现方法。"><a href="#总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断-，要不然可能会造成-一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll-要不然可能会造成全部进入休眠状态-导致程序无法运行。当然这只是生产者-消费者的一种实现方法-还有其他多种实现方法。" class="headerlink" title="总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断 ，要不然可能会造成 一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll() ,要不然可能会造成全部进入休眠状态 导致程序无法运行。当然这只是生产者 消费者的一种实现方法 还有其他多种实现方法。"></a>总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断 ，要不然可能会造成 一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll() ,要不然可能会造成全部进入休眠状态 导致程序无法运行。当然这只是生产者 消费者的一种实现方法 还有其他多种实现方法。</h5><p> <a class="link"   target="_blank" rel="noopener" href="https://github.com/huangjie-qq/Productionconsumer" >代码地址<i class="fas fa-external-link-alt"></i></a></p>
+
         </div>
 
         
