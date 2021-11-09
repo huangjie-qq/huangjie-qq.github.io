@@ -264,7 +264,7 @@
      &#125;
 </code></pre>
 <p>在单线程情况下 如果代码没有发送重排序 那么先运行init() 再运行 getValue()方法  打印的结果 肯定是1</p>
-<p>当cpu认为语句1和语句2没有关系时 继续了重排序可能会变成这样</p>
+<p>当cpu认为语句1和语句2没有关系时 进行了重排序可能会变成这样</p>
 <pre><code class="java">   public static  void  init()&#123;
          flag=true;  //语句2
          value=1;    //语句1
