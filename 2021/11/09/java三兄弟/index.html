@@ -9,7 +9,7 @@
     
     <title>
         
-            生产者/消费者模式 |
+            浅谈java三兄弟 |
         
         小球某的博客
     </title>
@@ -126,7 +126,7 @@
     <div class="article-content-container">
 
         <div class="article-title">
-            <span class="title-hover-animation">生产者/消费者模式</span>
+            <span class="title-hover-animation">浅谈java三兄弟</span>
         </div>
 
         
@@ -144,7 +144,7 @@
                     <div class="meta-info">
                         <div class="article-meta-info">
     <span class="article-date article-meta-item">
-        <i class="fas fa-edit"></i>&nbsp;2021-11-05 23:47:33
+        <i class="fas fa-edit"></i>&nbsp;2021-11-09 23:48:33
     </span>
     
     
@@ -153,7 +153,7 @@
             <ul>
                 
                     <li>
-                        <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a>&nbsp;
+                        <a href="/tags/java/">java</a>&nbsp;
                     </li>
                 
             </ul>
@@ -163,12 +163,12 @@
     
     
         <span class="article-wordcount article-meta-item">
-            <i class="fas fa-file-word"></i>&nbsp;<span>1.4k 字</span>
+            <i class="fas fa-file-word"></i>&nbsp;<span>2.8k 字</span>
         </span>
     
     
         <span class="article-min2read article-meta-item">
-            <i class="fas fa-clock"></i>&nbsp;<span>5 分钟</span>
+            <i class="fas fa-clock"></i>&nbsp;<span>9 分钟</span>
         </span>
     
     
@@ -184,194 +184,115 @@
         
 
         <div class="article-content markdown-body">
-            <h1 id="一步一步走进生产消费者"><a href="#一步一步走进生产消费者" class="headerlink" title="一步一步走进生产消费者"></a>一步一步走进生产消费者</h1><p>首我们创建一个普通java工程</p>
-<p>定义一个实现类 实现生产方法和消费方法 </p>
-<p>为了简单 我们就用使用普通的synchronized锁和  boolean变量来判断是否生产消费 </p>
-<pre><code class="java">/**
- * @Author：小球某
- * @Date：2021/11/06/0:01
- */
-public class Realization &#123;
-    private Object lock;//锁
-    private boolean sign=true;//true生产 false消费 看好这个状态位 下面很重要
-
-    public Realization(Object lock) &#123;
-        this.lock = lock;
-    &#125;
-&#125;
+            <h1 id="java对象模型-Java内存模型-JVM内存结构"><a href="#java对象模型-Java内存模型-JVM内存结构" class="headerlink" title="java对象模型 Java内存模型 JVM内存结构"></a>java对象模型 Java内存模型 JVM内存结构</h1><p>这三兄弟不要傻傻分不清</p>
+<h3 id="java对象模型："><a href="#java对象模型：" class="headerlink" title="java对象模型："></a>java对象模型：</h3><p>就是咱们经常在代码中new的对象 对象保存在堆中，而我们在对对象进行操作时，其实操作的是对象的引用。</p>
+<h5 id="Java对象包含三个部分"><a href="#Java对象包含三个部分" class="headerlink" title="Java对象包含三个部分"></a>Java对象包含三个部分</h5><p>一个Java对象可以分为三部分存储在内存中，分别是：对象头(Header)、实例数据(Instance Data)和对齐填充(Padding)。</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/java%E4%B8%89%E5%AF%B9%E8%B1%A1/1.png" alt="avatar"></p>
+<ol>
+<li>对象头：默认存储 (哈希值(HashCode )、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳)等信息。</li>
+<li>实例数据：它是对象真正存储的有效信息,包括程序代码中定义的各种类型的字段。</li>
+<li>对齐填充：虚拟机要求对象起始地址是8字节的整数倍。填充数据不是必须存在的,只是为了字节对齐。</li>
+</ol>
+<h4 id="java内存模型："><a href="#java内存模型：" class="headerlink" title="java内存模型："></a>java内存模型：</h4><p>Java内存模型也就是常说的JMM,是一组规范,需要各个JVM的实现来遵守JMM规范,以便于开发者可<br>以利用这些规范,更方便地开发多线程程序。</p>
+<p>为什么会有这组规范？</p>
+<p>在C语言中不存在内存模型这样的概念，所以很多行为都是依赖处理器本身的，而不同的处理器之间对synchronized的理解不一样 会导致处理的结果也是不一样的。在一个处理上是一个结果，另一个处理上又是其他结果，也无法保证并发的安全。由于我们java是跨平台，所以迫切的需要一种规范来 让多线程运行的结果达到预期的结果。如果没有这样的一个JMM内存模型来规范,那么很可能经过了不同JVM的不同规则的重排序之后,导致不同的虚拟机上运行的结果不一样,那是很大的问题。</p>
+<p>在这些规范当中 最重要的三点就是：<strong>原子性、可见性、重排序</strong></p>
+<h4 id="原子性："><a href="#原子性：" class="headerlink" title="原子性："></a>原子性：</h4><p>用通俗的话来讲 操作不可中断 ，即使是在多线程情况下也不可中断，要不然执行成功 ,要不然不执行 。</p>
+<p>在java中的原子操作有 ：</p>
+<p>1.除了long和double之外的基本类型 赋值操作</p>
+<p>2.所有引用的赋值操作</p>
+<p>3.原子包下的原子类的操作</p>
+<h4 id="可见性："><a href="#可见性：" class="headerlink" title="可见性："></a>可见性：</h4><p>保证多线程之间的修改变量 其他线程能够感知到。</p>
+<p>JMM有规定:</p>
+<p>1.所有的变量都存储在主内存中，同时每个线程有自己独立的工作内存，工作内存中的变量内容是主内存中的拷贝<br>2.线程不能直接读写主内存中的变量，而是只能操作自己工作内存中的变量,然后再同步到主内存中<br>3.主内存是多个线程共享的，但线程间不共享工作内存，如果线程间需要通信，必须借助主内存中转来完成<br>所有的共享变量存在于主内存中，每个线程有自己的本地内存,而且线程读写共享数据，也是通过本地内存交换的，所以才导致了可见性问题。</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/java%E4%B8%89%E5%AF%B9%E8%B1%A1/2.png" alt="avatar"></p>
+<p>那么JMM怎么保证可见性呢：</p>
+<p><strong>当我们的变量在Synchronize中或者被Volatile修饰时</strong></p>
+<ol>
+<li>变量的写操作会立即刷到主内存中，确保其他线程可以获取到最新的值。</li>
+<li>变量的读操作会直接读取主内存中的值。</li>
+</ol>
+<p>当然Volatile只能保证变量的可见性 并不能像Synchronize还能保证原子性，在这里就不详细展开了。</p>
+<h4 id="重排序："><a href="#重排序：" class="headerlink" title="重排序："></a>重排序：</h4><p>就是禁止重排序，那为什么会有重排序？：</p>
+<p>其实说到底都是源于对性能的优化，CPU运行效率 相比缓存、内存、硬盘IO之间效率有着指数级的差别，CPU作为系统的宝贵资源，那么如何更好的优化和利用这个资源就能提升整个计算机系统的性能</p>
+<p>从Java源代码到最终实际执行的指令序列，会分别经历下面3种重排序</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/java%E4%B8%89%E5%AF%B9%E8%B1%A1/3.png" alt="avatar"></p>
+<h5 id="指令重排序的原则（as-if-serial语义）"><a href="#指令重排序的原则（as-if-serial语义）" class="headerlink" title="指令重排序的原则（as-if-serial语义）"></a>指令重排序的原则（as-if-serial语义）</h5><p>编译器和处理指令也并非什么场景都会进行指令重排序的优化，而是会遵循一定的原则，只有在它们认为重排序后不会对程序结果产生影响的时候才会进行重排序的优化，如果重排序会改变程序的结果，那这样的性能优化显然是没有意义的。而遵守as-if-serial 语义规则就是重排序的一个原则，as-if-serial 的意思是说，可以允许编译器和处理器进行重排序，但是有一个条件，就是不管怎么重排序都不能改变单线程执行程序的结果。</p>
+<pre><code>1  a=1; //语句1
+2  b=2; //语句2
+3  a=a+3;
 </code></pre>
-<h5 id="编写生产方法"><a href="#编写生产方法" class="headerlink" title="编写生产方法"></a>编写生产方法</h5><pre><code class="java">   /**
-     *生产方法
-     */
-    public void producer()&#123;
-        synchronized (lock)&#123;
-            try&#123;
-                if(!sign)
-                    lock.wait();
-                System.out.println(Thread.currentThread().getName()+&quot; 生产&quot;);
-                sign=false;
-                lock.notify();
-            &#125;catch (InterruptedException e)&#123;
-                e.printStackTrace();
-            &#125;
-        &#125;
-    &#125;
+<p>对于上面代码的指令如下：</p>
+<pre><code>1.Load a
+2.Set to 1
+3.Store a
+4.Load b
+5.Set to 2
+6.Store b
+7.Load a
+8.Set to 4
+9.Store a
 </code></pre>
-<h5 id="编写消费者方法"><a href="#编写消费者方法" class="headerlink" title="编写消费者方法"></a>编写消费者方法</h5><pre><code class="java">   /**
-     * 消费方法
-     */
-    public void consumer()&#123;
-        synchronized (lock)&#123;
-            try&#123;
-                if(sign)
-                    lock.wait();
-                System.out.println(Thread.currentThread().getName()+&quot; 消费&quot;);
-                sign=true;
-                lock.notify();
-            &#125;catch (InterruptedException e)&#123;
-                e.printStackTrace();
-            &#125;
-        &#125;
-    &#125;
+<p>CPU会认为语句1和语句2没有关系 重排序后变成这样</p>
+<pre><code>1  b=2;
+2  a=1;
+3  a=a+3;
 </code></pre>
-<h5 id="编写生产者"><a href="#编写生产者" class="headerlink" title="编写生产者"></a>编写生产者</h5><pre><code class="java">/**
- * @Author：小球某
- * @Date：2021/11/06/00:16
- * 生产者
- */
-public class Producer implements Runnable&#123;
-    private Realization realization;
-    
-    public Producer(Realization realization) &#123;
-        this.realization = realization;
-    &#125;
-    
-    @Override
-    public void run() &#123;
-        while (true)&#123;
-            realization.producer();
-        &#125;
-    &#125;
-&#125;
+<p>对于的指令如下：</p>
+<pre><code>1.Load b
+2.Set to 2
+3.Store b
+4.Load a
+5.Set to 1
+6.Set to 4
+7.Store a
 </code></pre>
-<h5 id="编写消费者"><a href="#编写消费者" class="headerlink" title="编写消费者"></a>编写消费者</h5><pre><code class="java">/**
- * @Author：小球某
- * @Date：2021/11/06/00:19
- * 消费者
- */
-public class Consumer implements Runnable&#123;
-    private Realization realization;
-
-    public Consumer(Realization realization) &#123;
-        this.realization = realization;
-    &#125;
-    
-    @Override
-    public void run() &#123;
-       while (true)&#123;
-           realization.consumer();
-       &#125;   
-    &#125;
-&#125;
+<p>经过重排序后将9条指令优化成7条，那么重排序会优化我们的程序 那么为什么jmm还会有禁止重排序呢？</p>
+<p>看下面代码</p>
+<pre><code class="java">  private static int value;
+     private static boolean flag;
+ 
+     public static  void  init()&#123;
+         value=1;     //语句1
+         flag=true;  //语句2
+     &#125;
+ 
+     public static void getValue()&#123;
+         if(flag)&#123;
+             System.out.println(value);
+         &#125;
+     &#125;
 </code></pre>
-<h5 id="最后编写Main测试"><a href="#最后编写Main测试" class="headerlink" title="最后编写Main测试"></a>最后编写Main测试</h5><pre><code class="java">public static void main(String[] args) &#123;
-
-    Realization realization = new Realization(new Object());
-
-    Producer producer = new Producer(realization);
-    Consumer consumer = new Consumer(realization);
-
-    new Thread(producer,&quot;生产者&quot;).start();
-    new Thread(consumer,&quot;消费者&quot;).start();
-&#125;
+<p>在单线程情况下 如果代码没有发送重排序 那么先运行init() 再运行 getValue()方法  打印的结果 肯定是1</p>
+<p>当cpu认为语句1和语句2没有关系时 继续了重排序可能会变成这样</p>
+<pre><code class="java">   public static  void  init()&#123;
+         flag=true;  //语句2
+         value=1;    //语句1
+     &#125;
 </code></pre>
-<p>运行结果如下：</p>
-<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%94%9F%E4%BA%A7%E8%80%85/1.png" alt="avatar"></p>
-<p>运行结果也不错 生产一个消费多个 没有什么问题</p>
-<p>但我们实际使用生产者消费者模式的时候一般是会多个生产者和消费者</p>
-<p>这个我们开启多个生产者和多个消费者 试一试我们的代码</p>
-<pre><code class="java">public static void main(String[] args) &#123;
-
-        Realization realization = new Realization(new Object());
-
-        Producer producer = new Producer(realization);
-        Consumer consumer = new Consumer(realization);
-
-        new Thread(producer,&quot;生产者-1号&quot;).start();
-        new Thread(producer,&quot;生产者-2号&quot;).start();
-        new Thread(consumer,&quot;消费者-1号&quot;).start();
-        new Thread(consumer,&quot;消费者-2号&quot;).start();
-    &#125;
-</code></pre>
-<p>运行结果如下：</p>
-<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%94%9F%E4%BA%A7%E8%80%85/2.png" alt="avatar"></p>
-<p>为什么会这种 生产一个 消费两次的情况呢？</p>
-<p>来看核心代码：</p>
-<pre><code class="java">1   if(sign)
-2       lock.wait();
-3   System.out.println(Thread.currentThread().getName()+&quot; 消费&quot;);
-4   sign=true;
-5   lock.notify();
-</code></pre>
-<p>上面的boolean标记是默认是true，所以是要先生产 后消费</p>
-<h5 id="现在我们来模拟-刚刚发送的情况的这种情况"><a href="#现在我们来模拟-刚刚发送的情况的这种情况" class="headerlink" title="现在我们来模拟 刚刚发送的情况的这种情况"></a>现在我们来模拟 刚刚发送的情况的这种情况</h5><h5 id="生产者-t1-t2-消费者：t3-t4"><a href="#生产者-t1-t2-消费者：t3-t4" class="headerlink" title="生产者:t1 t2 消费者：t3 t4"></a>生产者:t1 t2 消费者：t3 t4</h5><p>1步： t3得到调度 判断If  为  true  t3休眠  （休眠：t3   状态位：true）</p>
-<p>2步：恰巧t4也得到调度 和t3一样休眠 （休眠：t3  t4   状态位：true）</p>
-<p>3步：t1得到调度 首先判断if 要生产一个消息 然后改变状态位 用notify 唤醒了t3  (休眠：t4   状态位：false)</p>
-<p>4步：t3得到调度 从第2行代码醒来的t3 会接着往下执行3 4行代码 并改变状态位  唤醒的人是t4 (状态位：true)</p>
-<p>5步：t4得到调度  从第2行代码醒来的t4   会接着往下执行3 4行代码 改变状态位 唤醒</p>
-<p>其实在第5步 t4唤醒 往下执行的时候就错误了 状态位都是true </p>
-<p>问题出的地方就是 不管是生产者还是消费者 ，每次唤醒的时候 ，都要回头在看一下状态位是否正确 ，正确则继续执行 否则就继续休眠。</p>
-<h5 id="解决办法：用while来判断状态位"><a href="#解决办法：用while来判断状态位" class="headerlink" title="解决办法：用while来判断状态位"></a>解决办法：用while来判断状态位</h5><h5 id="修改后的生产者方法"><a href="#修改后的生产者方法" class="headerlink" title="修改后的生产者方法"></a>修改后的生产者方法</h5><pre><code class="java">   /**
-     *生产方法
-     */
-    public void producer()&#123;
-        synchronized (lock)&#123;
-            try&#123;
-                while(!sign)
-                    lock.wait();
-                System.out.println(Thread.currentThread().getName()+&quot; 生产&quot;);
-                sign=false;
-                lock.notify();
-            &#125;catch (InterruptedException e)&#123;
-                e.printStackTrace();
-            &#125;
-        &#125;
-    &#125;
-</code></pre>
-<h5 id="修改后的消费者方法"><a href="#修改后的消费者方法" class="headerlink" title="修改后的消费者方法"></a>修改后的消费者方法</h5><pre><code class="java">   /**
-     * 消费方法
-     */
-    public void consumer()&#123;
-        synchronized (lock)&#123;
-            try&#123;
-                while(sign)
-                    lock.wait();
-                System.out.println(Thread.currentThread().getName()+&quot; 消费&quot;);
-                sign=true;
-                lock.notify();
-            &#125;catch (InterruptedException e)&#123;
-                e.printStackTrace();
-            &#125;
-        &#125;
-    &#125;
-</code></pre>
-<p>修改完代码后 我们继续运行：</p>
-<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%94%9F%E4%BA%A7%E8%80%85/3.png" alt="avatar"></p>
-<p>可以看到程序是没有停止了 但为什么会没有运行下去呢？</p>
-<p>来看核心代码：</p>
-<pre><code class="java">lock.notify();
-</code></pre>
-<h5 id="现在我们来模拟-刚刚发送的情况的这种情况-1"><a href="#现在我们来模拟-刚刚发送的情况的这种情况-1" class="headerlink" title="现在我们来模拟 刚刚发送的情况的这种情况"></a>现在我们来模拟 刚刚发送的情况的这种情况</h5><h5 id="生产者-t1-t2-消费者：t3-t4-1"><a href="#生产者-t1-t2-消费者：t3-t4-1" class="headerlink" title="生产者:t1 t2 消费者：t3 t4"></a>生产者:t1 t2 消费者：t3 t4</h5><p>1步：t3得到调度 判断状态位 休眠  （休眠：t3）</p>
-<p>2步：t4得到调度  判断状态位 休眠   (休眠：t3  t4）</p>
-<p>3步：t1得到调度 判断状态位  生产 唤醒 t3   (休眠：t4)</p>
-<p>4步：t1又被调度  判断状态位 休眠   (休眠：t4  t1)</p>
-<p>5步：t2得到调度  判断状态位 休眠   (休眠：t4  t1  t2)</p>
-<p>6步：t3得到调度  判断状态位  消费  唤醒t4  (休眠：t1  t2)</p>
-<p>7步：t3又被调度  判断状态位  休眠  （休眠：t1 t2  t3）</p>
-<p>8步：只有t4存活 得到调度 判断状态位 休眠  （休眠：t1  t2 t3  t4）</p>
-<p>至此所以线程全部到了休眠状态 也没有其他线程会唤醒</p>
-<h5 id="解决办法-使用lock-notifyAll"><a href="#解决办法-使用lock-notifyAll" class="headerlink" title="解决办法 使用lock.notifyAll();"></a>解决办法 使用lock.notifyAll();</h5><h5 id="总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断-，要不然可能会造成-一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll-要不然可能会造成全部进入休眠状态-导致程序无法运行。当然这只是生产者-消费者的一种实现方法-还有其他多种实现方法。"><a href="#总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断-，要不然可能会造成-一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll-要不然可能会造成全部进入休眠状态-导致程序无法运行。当然这只是生产者-消费者的一种实现方法-还有其他多种实现方法。" class="headerlink" title="总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断 ，要不然可能会造成 一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll() ,要不然可能会造成全部进入休眠状态 导致程序无法运行。当然这只是生产者 消费者的一种实现方法 还有其他多种实现方法。"></a>总结：在多生产者多线程的情况下，判断状态位的时候需要使用while判断 ，要不然可能会造成 一次生产多次消费，或者一次消费多次生产的情况，唤醒线程使用notifyAll() ,要不然可能会造成全部进入休眠状态 导致程序无法运行。当然这只是生产者 消费者的一种实现方法 还有其他多种实现方法。</h5><p> <a class="link"   target="_blank" rel="noopener" href="https://github.com/huangjie-qq/Productionconsumer" >代码地址<i class="fas fa-external-link-alt"></i></a></p>
-
+<p>这个时候两个线程分别调用 init()和getValue()方法，那么就有可能出现这种情况</p>
+<p>线程一 执行 init() 当执行到   flag=true; 时  </p>
+<p>线程二 马上执行完 getValue()方法 然后会打印0</p>
+<p>然后线程一在把  value=1; 执行完毕。</p>
+<p>这样就是导致和我们预期的结果不一致 ,我们预期的结果是调用  getValue()方法打印1出来 。</p>
+<p>所以在复杂的多线程环境下，编译器和处理器是根本无法通过语义分析来知道代码指令的依赖关系的，所以这个问题只交给能写代码的人才能清楚的知道，这个时候编写代码的人就需要通过一种方式显示的告诉编译器和处理器哪些地方是存在逻辑依赖的，这些地方不能进行重排序。</p>
+<h5 id="使用Volatile就能保证禁止重排序"><a href="#使用Volatile就能保证禁止重排序" class="headerlink" title="使用Volatile就能保证禁止重排序"></a>使用Volatile就能保证禁止重排序</h5><h1 id="JVM内存结构"><a href="#JVM内存结构" class="headerlink" title="JVM内存结构"></a>JVM内存结构</h1><p>Java 虚拟机在执行 Java 程序的过程中会把它管理的内存划分为若干个不同的数据区域。</p>
+<p>每个区域都有各自的作用。</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/java%E4%B8%89%E5%AF%B9%E8%B1%A1/4.png" alt="avatar"></p>
+<p>上面图中 绿色区域都是线程共享的  黄色区域都是线程私有的。</p>
+<h5 id="程序计数器："><a href="#程序计数器：" class="headerlink" title="程序计数器："></a>程序计数器：</h5><p>是记住下一条jvm指令的执行地址 当执行的是Native方法是为0  ,是线程私有 和其他区不同的是 程序计数器永远不会内存溢出。</p>
+<h5 id="java栈："><a href="#java栈：" class="headerlink" title="java栈："></a>java栈：</h5><p>每当启动一个新线程时，Java虚拟机都会为它分配一个Java栈。Java栈以帧为单位保存线程的运行状态。虚拟机只会直接对Java栈执行两种操作：以帧为单位的压栈和出栈。</p>
+<p>　　某个线程正在执行的方法被称为该线程的当前方法，当前方法使用的栈帧称为当前帧，当前方法所属的类称为当前类，当前类的常量池称为当前常量池。在线程执行一个方法时，它会跟踪当前类和当前常量池。此外，当虚拟机遇到栈内操作指令时，它对当前帧内数据执行操作。</p>
+<p>　　每当线程调用一个Java方法时，虚拟机都会在该线程的Java栈中压入一个新帧。而这个新帧自然就成为了当前帧。在执行这个方法时，它使用这个帧来存储参数、局部变量、中间运算结果等数据。</p>
+<p>　　Java方法可以以两种方式完成。一种通过return返回的，称为正常返回；一种是通过抛出异常而异常终止的。不管以哪种方式返回，虚拟机都会将当前帧弹出Java栈然后释放掉，这样上一个方法的帧就成为当前帧了。</p>
+<p>　　Java帧上的所有数据都是此线程私有的。任何线程都不能访问另一个线程的栈数据，因此我们不需要考虑多线程情况下栈数据的访问同步问题。当一个线程调用一个方法时，方法的的局部变量保存在调用线程Java栈的帧中。只有一个线程能总是访问那些局部变量，即调用方法的线程。</p>
+<h5 id="本地方法栈："><a href="#本地方法栈：" class="headerlink" title="本地方法栈："></a>本地方法栈：</h5><p>Java 虚拟机的实现可以使用传统的堆栈，通俗地称为“C 堆栈”，以支持<code>native</code>方法（用 Java 编程语言以外的语言编写的方法）。本机方法堆栈也可以由 Java 虚拟机指令集的解释器实现使用，例如 C 语言。无法加载<code>native</code> 方法且本身不依赖常规堆栈的Java 虚拟机实现不需要提供本机方法堆栈. 如果提供，则通常在创建每个线程时为每个线程分配本机方法堆栈。</p>
+<h5 id="堆区："><a href="#堆区：" class="headerlink" title="堆区："></a>堆区：</h5><p>Java 虚拟机有一个在所有 Java 虚拟机线程之间共享的<em>堆</em>。堆是运行时数据区，从中分配所有类实例和数组的内存，线程共享的。</p>
+<h5 id="方法区："><a href="#方法区：" class="headerlink" title="方法区："></a>方法区：</h5><p>Java 虚拟机有一个在所有 Java 虚拟机线程之间共享的<em>方法区</em>。方法区类似于传统语言的编译代码存储区，或类似于操作系统进程中的“文本”段。它存储每个类的结构，例如运行时常量池、字段和方法数据，以及方法和构造函数的代码，包括在类和实例初始化和接口初始化中使用的特殊方法。</p>
+<p>1.6在堆区中使用 永久代实现 ，1.8使用堆外内存 元空间实现。</p>
+<p>使用元空间的好处是</p>
+<p>1.字符串常量池存在永久代中,容易出现性能问题和内存溢出<br>2.类和方法的信息大小难易确定,给永久代的大小指定带来困难<br>3.永久代会为GC带来不必要的复杂性</p>
+<h5 id=""><a href="#" class="headerlink" title=""></a></h5>
         </div>
 
         
@@ -379,29 +300,14 @@ public class Consumer implements Runnable&#123;
         
             <div class="article-nav">
                 
-                    <div class="article-prev">
-                        <a class="prev"
-                           rel="prev"
-                           href="/2021/11/09/java%E4%B8%89%E5%85%84%E5%BC%9F/"
-                        >
-                            <span class="left arrow-icon flex-center">
-                              <i class="fas fa-chevron-left"></i>
-                            </span>
-                            <span class="title flex-center">
-                                <span class="post-nav-title-item">浅谈java三兄弟</span>
-                                <span class="post-nav-item">上一篇</span>
-                            </span>
-                        </a>
-                    </div>
-                
                 
                     <div class="article-next">
                         <a class="next"
                            rel="next"
-                           href="/2021/10/31/SSO-%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/"
+                           href="/2021/11/05/%E7%94%9F%E6%88%90%E8%80%85-%E6%B6%88%E8%B4%B9%E8%80%85%E6%A8%A1%E5%BC%8F/"
                         >
                             <span class="title flex-center">
-                                <span class="post-nav-title-item">简单实现单点登录</span>
+                                <span class="post-nav-title-item">生产者/消费者模式</span>
                                 <span class="post-nav-item">下一篇</span>
                             </span>
                             <span class="right arrow-icon flex-center">
