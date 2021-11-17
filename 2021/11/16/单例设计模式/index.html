@@ -9,7 +9,7 @@
     
     <title>
         
-            设计模式之建造者模式 |
+            单例的五种实现 |
         
         小球某的博客
     </title>
@@ -126,7 +126,7 @@
     <div class="article-content-container">
 
         <div class="article-title">
-            <span class="title-hover-animation">设计模式之建造者模式</span>
+            <span class="title-hover-animation">单例的五种实现</span>
         </div>
 
         
@@ -144,7 +144,7 @@
                     <div class="meta-info">
                         <div class="article-meta-info">
     <span class="article-date article-meta-item">
-        <i class="fas fa-edit"></i>&nbsp;2021-10-27 18:03:43
+        <i class="fas fa-edit"></i>&nbsp;2021-11-16 23:33:26
     </span>
     
     
@@ -163,12 +163,12 @@
     
     
         <span class="article-wordcount article-meta-item">
-            <i class="fas fa-file-word"></i>&nbsp;<span>940 字</span>
+            <i class="fas fa-file-word"></i>&nbsp;<span>1.9k 字</span>
         </span>
     
     
         <span class="article-min2read article-meta-item">
-            <i class="fas fa-clock"></i>&nbsp;<span>4 分钟</span>
+            <i class="fas fa-clock"></i>&nbsp;<span>7 分钟</span>
         </span>
     
     
@@ -184,220 +184,188 @@
         
 
         <div class="article-content markdown-body">
-            <h2 id="介绍："><a href="#介绍：" class="headerlink" title="介绍："></a>介绍：</h2><p>建造者模式的定义是：<strong>将复杂对象的构造与它的表示分离</strong>，<strong>使同样的构建过程可以创建不同的表示</strong>，<strong>这样的设计模式被称为建造者模式。</strong></p>
-<h2 id="为什么使用构建者模式？什么场景使用构建者模式？"><a href="#为什么使用构建者模式？什么场景使用构建者模式？" class="headerlink" title="为什么使用构建者模式？什么场景使用构建者模式？"></a>为什么使用构建者模式？什么场景使用构建者模式？</h2><ul>
-<li>假如我们需要一个对象，一个对象的创建非常的复杂，对象中还要对象的封装，那么我们就可以使用构建者模式，将该对象的构建交给它来处理，我们使用的时候找他要一个对象就可以了。</li>
-</ul>
-<h3 id="假如现在有个User类如下"><a href="#假如现在有个User类如下" class="headerlink" title="假如现在有个User类如下"></a>假如现在有个User类如下</h3><pre><code class="java">/**
+            <h1 id="设计模式之单例模式"><a href="#设计模式之单例模式" class="headerlink" title="设计模式之单例模式"></a>设计模式之单例模式</h1><p><strong>什么是单例设计模式？</strong></p>
+<p>单例模式，是一种常用的软件设计模式。在它的核心结构中只包含一个被称为单例的特殊类。通过单例模式可以保证系统中，应用该模式的类一个类只有一个实例。即一个类只有一个对象实例。</p>
+<p><strong>具体实现</strong></p>
+<p>需要：</p>
+<p>（1）将构造方法私有化，使其不能在类的外部通过new关键字实例化该类对象。</p>
+<p>（2）在该类内部产生一个唯一的实例化对象，并且将其封装为private static类型。</p>
+<p>（3）定义一个静态方法返回这个唯一对象。</p>
+<h3 id="饿汉式："><a href="#饿汉式：" class="headerlink" title="饿汉式："></a>饿汉式：</h3><p>顾名思义很饿 所以在类加载的时候就加载了对象</p>
+<pre><code class="java">/**
  * @Author：小球某
- * @Date：2021/10/27/17:48
+ * @Date：2021/11/16/23:47
+ * 饿汉式
  */
-@Data
-public class User &#123;
+public class HungrySingleton &#123;
+    private HungrySingleton()&#123;&#125;;
 
-    private String name;
-    private int age;
-    private String sex;
-    private String phone;
-    private String address;
+    private static final HungrySingleton SINGLETON=new HungrySingleton();
 
-&#125;    
-</code></pre>
-<p>当我们要构建name字段和age字段时 我们可以这样</p>
-<pre><code class="java">public User(String name, int age) &#123;
-        this.name = name;
-        this.age = age;
+    public static HungrySingleton getInstance()&#123;
+       return SINGLETON;
+    &#125;
 &#125;
 </code></pre>
-<p>同理当需要构建 name字段 age字段  sex字段时</p>
-<pre><code class="java">public User(String name, int age, String sex) &#123;
-        this.name = name;
-        this.age = age;
-        this.sex = sex;
-&#125;
-</code></pre>
-<p>当我们每次需要构配不同对象时，就要为这些字段生成不同的构造函数，如此一来 我们的构造函数就特别多</p>
-<p>并且阅读性也特别的不好。</p>
-<h4 id="当然还有一种解决办法-就是生成-get-set方法"><a href="#当然还有一种解决办法-就是生成-get-set方法" class="headerlink" title="当然还有一种解决办法 就是生成 get set方法"></a>当然还有一种解决办法 就是生成 get set方法</h4><pre><code class="java">   public void setName(String name) &#123;
-        this.name = name;
-    &#125;
+<h5 id="饿汉式优缺点："><a href="#饿汉式优缺点：" class="headerlink" title="饿汉式优缺点："></a>饿汉式优缺点：</h5><p>优点：实现起来简单，没有多线程同步问题。</p>
+<p>缺点：当类SingletonTest被加载的时候，会初始化static的instance，静态变量被创建并分配内存空间，从这以后，这个static的instance对象便一直占着这段内存（即便你还没有用到这个实例），当类被卸载时，静态变量被摧毁，并释放所占有的内存，因此在某些特定条件下会耗费内存。</p>
+<h3 id="懒汉式"><a href="#懒汉式" class="headerlink" title="懒汉式:"></a>懒汉式:</h3><p>很懒只有要用时候才会去加载</p>
+<pre><code class="java">package com.xqm;
 
-    public void setAge(int age) &#123;
-        this.age = age;
-    &#125;
-
-    public void setSex(String sex) &#123;
-        this.sex = sex;
-    &#125;
-
-    public void setPhone(String phone) &#123;
-        this.phone = phone;
-    &#125;
-
-    public void setAddress(String address) &#123;
-        this.address = address;
-    &#125;
-</code></pre>
-<p>写的时候这样就可以了</p>
-<pre><code class="java">public static void main(String[] args) &#123;
-      User user=new User();
-      user.setName(&quot;小球某&quot;);
-      user.setAge(20);
-      user.setSex(&quot;男&quot;);
-&#125;
-</code></pre>
-<p>这样一来就痛苦的是我们程序员了 这个时候构建者就来了</p>
-<h4 id="首先来个静态内部类-字段和User类保持一致"><a href="#首先来个静态内部类-字段和User类保持一致" class="headerlink" title="首先来个静态内部类 字段和User类保持一致"></a>首先来个静态内部类 字段和User类保持一致</h4><pre><code class="java">/**
-     * 内部类
-     */
-    public static class builder&#123;
-    
-        private String name;
-        private int age;
-        private String sex;
-        private String phone;
-        private String address;
-
-    &#125;
-</code></pre>
-<h4 id="提供构建各个字段的方法"><a href="#提供构建各个字段的方法" class="headerlink" title="提供构建各个字段的方法"></a>提供构建各个字段的方法</h4><pre><code class="java">     public builder name(String name)&#123;
-         this.name=name;
-         return this;
-     &#125;
-
-     public builder age(int age)&#123;
-         this.age=age;
-         return this;
-     &#125;
-
-     public builder sex(String sex)&#123;
-         this.sex=sex;
-         return this;
-     &#125;
-
-     public builder phone(String phone)&#123;
-         this.phone=phone;
-         return this;
-     &#125;
-
-     public builder address(String address)&#123;
-         this.address=address;
-         return this;
-     &#125;
-</code></pre>
-<h4 id="最后提供构建build方法-同时在User提供构造函数"><a href="#最后提供构建build方法-同时在User提供构造函数" class="headerlink" title="最后提供构建build方法 同时在User提供构造函数"></a>最后提供构建build方法 同时在User提供构造函数</h4><pre><code class="java">public User build()&#123;
-   return new User(this);
-&#125;
-
-public User(builder builder)&#123;
-        this.name= builder.name;
-        this.age= builder.age;
-        this.sex= builder.sex;
-        this.phone= builder.phone;
-        this.address= builder.address;
- &#125;
-</code></pre>
-<h4 id="完整代码"><a href="#完整代码" class="headerlink" title="完整代码"></a>完整代码</h4><pre><code class="java">/**
+/**
  * @Author：小球某
- * @Date：2021/10/27/17:48
+ * @Date：2021/11/16/23:56
+ * 懒汉式
  */
-@Data
-public class User &#123;
-
-    private String name;
-    private int age;
-    private String sex;
-    private String phone;
-    private String address;
-
-
-    public User() &#123;
-    &#125;
-
-    public User(builder builder)&#123;
-        this.name= builder.name;
-        this.age= builder.age;
-        this.sex= builder.sex;
-        this.phone= builder.phone;
-        this.address= builder.address;
-    &#125;
-
-    /**
-     * 内部类
-     */
-    public static class builder&#123;
+public class LazySingleton &#123;
+    private LazySingleton()&#123;&#125;;
     
-        private String name;
-        private int age;
-        private String sex;
-        private String phone;
-        private String address;
-
-        public builder name(String name)&#123;
-            this.name=name;
-            return this;
-        &#125;
-
-        public builder age(int age)&#123;
-            this.age=age;
-            return this;
-        &#125;
-
-        public builder sex(String sex)&#123;
-            this.sex=sex;
-            return this;
-        &#125;
-
-        public builder phone(String phone)&#123;
-            this.phone=phone;
-            return this;
-        &#125;
-
-        public builder address(String address)&#123;
-            this.address=address;
-            return this;
-        &#125;
-
-        public User build()&#123;
-            return new User(this);
-        &#125;
-
-    &#125;
-&#125;
-</code></pre>
-<h4 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h4><pre><code class="java">public static void main(String[] args) &#123;
-        User user1 = new User.builder().name(&quot;小球某&quot;).age(20).build();
-        User user2 = new User.builder().name(&quot;小球某&quot;).age(20).sex(&quot;男&quot;).build();
-        System.out.println(user1);
-        System.out.println(user2);
-&#125;
-</code></pre>
-<p>运行结果如下：</p>
-<pre><code class="java">User(name=小球某, age=20, sex=null, phone=null, address=null)
-User(name=小球某, age=20, sex=男, phone=null, address=null)
-</code></pre>
-<h3 id="终极方法：lombok的Builder注解"><a href="#终极方法：lombok的Builder注解" class="headerlink" title="终极方法：lombok的Builder注解"></a>终极方法：lombok的Builder注解</h3><pre><code class="java">@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class User &#123;
-
-    private String name;
-    private int age;
-    private String sex;
-    private String phone;
-    private String address;
+    private static LazySingleton SINGLETEN;
     
+    public static LazySingleton getInstance()&#123;
+        if(SINGLETEN==null)&#123;   //语句1
+            SINGLETEN=new LazySingleton(); //语句2
+        &#125;
+        return SINGLETEN;
+    &#125;
+
 &#125;
 </code></pre>
-<h4 id="用法-1"><a href="#用法-1" class="headerlink" title="用法"></a>用法</h4><pre><code class="java"> public static void main(String[] args) &#123;
-        User user = User.builder().name(&quot;小球某&quot;).age(20).sex(&quot;男&quot;).build();
-        System.out.println(user);
- &#125;
+<p>这种写法在单线程情况下这种下是没有安全问题的。</p>
+<p>多线程情况下  当线程一和线程二 同时来到语句1 然后判断为空 分别会执行语句2 把对象创建多次。</p>
+<p>那么为了线程安全 我们这样修改代码</p>
+<pre><code class="java"> public static synchronized LazySingleton getInstance()&#123;
+        if(SINGLETEN==null)&#123;
+            SINGLETEN=new LazySingleton();
+        &#125;
+        return SINGLETEN;
+    &#125;
 </code></pre>
-<p>运行结果如下：</p>
-<pre><code class="java">User(name=小球某, age=20, sex=男, phone=null, address=null)
+<p>这样修改后虽然没有多线程的情况为了 ，但是直接把synchronized套在方法上 让方法的执行效率很低，每一次只能让一个线程进来 即使是对象已经不为空创建了。</p>
+<p>那么为了即保证线程又要保证执行效率 就要缩小synchronized的粒度 不能直接使用在方法上。</p>
+<pre><code class="java"> public static  LazySingleton getInstance()&#123;
+        if(SINGLETEN==null)&#123;//语句1
+            synchronized (LazySingleton.class)&#123;//语句2
+                SINGLETEN=new LazySingleton();
+            &#125;
+        &#125;
+        return SINGLETEN;
+    &#125;
 </code></pre>
+<p>把粒度缩小到创建对象上 那么这样写有没有问题呢？</p>
+<p>当第一次执行的时候 ，线程一和线程二同时来到语句1，判断为空执行语句2的时候 ，虽然加了synchronized</p>
+<p>但也只是让同一时刻 ，有一个线程创建对象而已，线程一创建完成以后 释放锁  线程二拿到锁 继续执行对象。</p>
+<p>那么问题就出现在线程二语句2 的时候，不能直接创建 而应该再次判断对象是否为空。</p>
+<pre><code class="java"> public static  LazySingleton getInstance()&#123;
+        if(SINGLETEN==null)&#123;//语句1
+            synchronized (LazySingleton.class)&#123;//语句2
+                if(SINGLETEN==null)&#123;
+                    SINGLETEN=new LazySingleton();
+                &#125;
+            &#125;
+        &#125;
+        return SINGLETEN;
+    &#125;
+</code></pre>
+<p>这样的写法就是大名鼎鼎的DCL双检查锁机制  那么这样写就真的没有问题的了吗？</p>
+<p>在上一篇<a class="link"   target="_blank" rel="noopener" href="https://huangjie-qq.github.io/2021/11/09/java%E4%B8%89%E5%85%84%E5%BC%9F/" >java三兄弟<i class="fas fa-external-link-alt"></i></a>中讲了JMM。</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%8D%95%E4%BE%8B/1.png" alt="avatar"></p>
+<p>创建对象的过程如上图，当发生重排序后 会颠倒 2 3的执行顺序。</p>
+<p>线程一  在创建对象的时候  发生了重排序  执行了3  还没来得及执行2</p>
+<p>线程二  看到指向的内存地址，就会判断不为空，从而直接返回。   其实这个时候对象是没有完成初始化的，当外界使用对象的时候， 所以就会发生错误。</p>
+<h5 id="为了解决发生重排序问题-要使用volatile修饰-最终代码如下"><a href="#为了解决发生重排序问题-要使用volatile修饰-最终代码如下" class="headerlink" title="为了解决发生重排序问题 要使用volatile修饰  最终代码如下"></a>为了解决发生重排序问题 要使用volatile修饰  最终代码如下</h5><pre><code class="java">public class LazySingleton &#123;
+    private LazySingleton()&#123;&#125;;
+
+    private static volatile LazySingleton SINGLETEN;
+
+    public static  LazySingleton getInstance()&#123;
+        if(SINGLETEN==null)&#123;
+            synchronized (LazySingleton.class)&#123;
+                if(SINGLETEN==null)&#123;
+                    SINGLETEN=new LazySingleton();
+                &#125;
+            &#125;
+        &#125;
+        return SINGLETEN;
+    &#125;
+
+&#125;
+</code></pre>
+<h5 id="懒汉式优缺点："><a href="#懒汉式优缺点：" class="headerlink" title="懒汉式优缺点："></a>懒汉式优缺点：</h5><p>优点：实现延迟加载 不使用的情况下，能够节约一定的内存。</p>
+<p>缺点：实现起来比较复杂，得考虑多线程情况下发生的问题。</p>
+<h3 id="静态内存类"><a href="#静态内存类" class="headerlink" title="静态内存类"></a>静态内存类</h3><p>利用加载一个类时，其内部类不会同时被加载。当且仅当其某个静态成员（静态域、构造器、静态方法等）被调用时，才会触发加载。</p>
+<pre><code class="java">/**
+ * @Author：球某
+ * @Date：2021/11/17/1:44
+ * 静态内部类
+ */
+public class StaticInnerClassSingleton &#123;
+
+    private StaticInnerClassSingleton()&#123;&#125;
+
+    private static class InnerClass&#123;
+       private static StaticInnerClassSingleton singleton=new StaticInnerClassSingleton();
+    &#125;
+
+    public static StaticInnerClassSingleton getInstance()&#123;
+        return InnerClass.singleton;
+    &#125;
+
+&#125;
+</code></pre>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E5%8D%95%E4%BE%8B/2.png" alt="avatar"></p>
+<p>这种写法在多线程情况下就没有安全问题吗？</p>
+<p>从上图可以看出， 当两个线程同时加载时 JVM会保证只能有一个线程去加载，即线程0在加载时内部发生了重排序，由于加了锁，整个重排序对线程1是不可见的 ，线程1只能等待 线程0加载完成。</p>
+<p>所以就不会出现上面这种情况，一个线程发生重排序 还没执行完2的时候 ，被另一个看到已经有指向的地址，从而来判断不为空 直接返回 然后在外界使用还没有初始化完成的对象。 </p>
+<h5 id="静态内部类优缺点："><a href="#静态内部类优缺点：" class="headerlink" title="静态内部类优缺点："></a>静态内部类优缺点：</h5><p>优点：也实现延迟加载 也能保证线程的安全。</p>
+<p>缺点：实现起来还要额外写一个内部类。</p>
+<h3 id="容器实现法："><a href="#容器实现法：" class="headerlink" title="容器实现法："></a>容器实现法：</h3><p>利用ConcurrentHashMap来实现单例</p>
+<pre><code class="java">/**
+ * @Author：小球某
+ * @Date：2021/11/17/1:54
+ */
+public class ContainerSingleton &#123;
+    private ContainerSingleton()&#123;&#125;;
+
+    private static ConcurrentHashMap&lt;String,ContainerSingleton&gt; map=new ConcurrentHashMap();
+
+    private static String KEY=&quot;singleten&quot;;
+
+    public static ContainerSingleton getInstance()&#123;
+        ContainerSingleton singleten = map.get(KEY);
+        return singleten!=null?singleten:map.computeIfAbsent(KEY,s-&gt; new ContainerSingleton());
+    &#125;
+
+&#125;
+</code></pre>
+<p>通过使用ConcurrentHashMap的computeIfAbsent方法实现，能够实现原子性的操作，从而达到多线程的安全。</p>
+<h5 id="容器实现法优缺点："><a href="#容器实现法优缺点：" class="headerlink" title="容器实现法优缺点："></a>容器实现法优缺点：</h5><p>优点：也实现延迟加载 也能保证线程的安全。</p>
+<p>缺点：还需要额外使用容器来存储对象，浪费了一定的内存。</p>
+<h3 id="枚举法："><a href="#枚举法：" class="headerlink" title="枚举法："></a>枚举法：</h3><p>利用枚举来实现单例</p>
+<pre><code class="java">/**
+ * @Author：球某
+ * @Date：2021/11/17/1:59
+ * 枚举法
+ */
+public enum EnumSingleton &#123;
+    INSTANCE;
+    private DbConnect dbConnect;
+
+    private EnumSingleton()&#123;
+        dbConnect=new DbConnect();
+    &#125;
+
+    public static DbConnect getInstance()&#123;
+        return INSTANCE.dbConnect;
+    &#125;
+
+    private class DbConnect&#123;&#125; //模拟一个数据库连接对象
+&#125;
+</code></pre>
+<p>Java规范字规定，每个枚举类型及其定义的枚举变量在JVM中都是唯一的，因此在枚举类型的序列化和反序列化上，Java做了特殊的规定。在序列化的时候Java仅仅是将枚举对象的name属性输到结果中，反序列化的时候则是通过java.lang.Enum的valueOf()方法来根据名字查找枚举对象。也就是说，序列化的时候只将DATASOURCE这个名称输出，反序列化的时候再通过这个名称，查找对应的枚举类型，因此反序列化后的实例也会和之前被序列化的对象实例相同。</p>
+<h5 id="枚举法优缺点："><a href="#枚举法优缺点：" class="headerlink" title="枚举法优缺点："></a>枚举法优缺点：</h5><p>优点：写法简单高效，天然的防止反序列化和反射。</p>
+<p>缺点：在我看来没有缺点。</p>
+<h5 id="总结：各种写法都有自己的优缺点，面试问的比较多就是DCL双检查锁机制-最实用的也是就是枚举，当然关于单例的序列化和反射破坏-留到下一篇来讲。"><a href="#总结：各种写法都有自己的优缺点，面试问的比较多就是DCL双检查锁机制-最实用的也是就是枚举，当然关于单例的序列化和反射破坏-留到下一篇来讲。" class="headerlink" title="总结：各种写法都有自己的优缺点，面试问的比较多就是DCL双检查锁机制  最实用的也是就是枚举，当然关于单例的序列化和反射破坏 留到下一篇来讲。"></a>总结：各种写法都有自己的优缺点，面试问的比较多就是DCL双检查锁机制  最实用的也是就是枚举，当然关于单例的序列化和反射破坏 留到下一篇来讲。</h5><p><a class="link"   target="_blank" rel="noopener" href="https://github.com/huangjie-qq/Singleton" >代码地址<i class="fas fa-external-link-alt"></i></a></p>
 
         </div>
 
@@ -406,29 +374,14 @@ public class User &#123;
         
             <div class="article-nav">
                 
-                    <div class="article-prev">
-                        <a class="prev"
-                           rel="prev"
-                           href="/2021/10/31/SSO-%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/"
-                        >
-                            <span class="left arrow-icon flex-center">
-                              <i class="fas fa-chevron-left"></i>
-                            </span>
-                            <span class="title flex-center">
-                                <span class="post-nav-title-item">简单实现单点登录</span>
-                                <span class="post-nav-item">上一篇</span>
-                            </span>
-                        </a>
-                    </div>
-                
                 
                     <div class="article-next">
                         <a class="next"
                            rel="next"
-                           href="/2021/10/26/demo2/"
+                           href="/2021/11/09/java%E4%B8%89%E5%85%84%E5%BC%9F/"
                         >
                             <span class="title flex-center">
-                                <span class="post-nav-title-item">利用反射+自定义注解 实现各种Bean之间的轻松转换</span>
+                                <span class="post-nav-title-item">浅谈java三兄弟</span>
                                 <span class="post-nav-item">下一篇</span>
                             </span>
                             <span class="right arrow-icon flex-center">
