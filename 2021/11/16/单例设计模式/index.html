@@ -241,8 +241,8 @@ public class LazySingleton &#123;
         return SINGLETEN;
     &#125;
 </code></pre>
-<p>这样修改后虽然没有多线程的情况为了 ，但是直接把synchronized套在方法上 让方法的执行效率很低，每一次只能让一个线程进来 即使是对象已经不为空创建了。</p>
-<p>那么为了即保证线程又要保证执行效率 就要缩小synchronized的粒度 不能直接使用在方法上。</p>
+<p>这样修改后虽然没有多线程下没有问题 ，但是直接把synchronized套在方法上 ，让方法的执行效率很低，每一次只能让一个线程进来 即使是对象已经不为空创建了。</p>
+<p>那么为了即保证线程安全又要保证执行效率 就要缩小synchronized的粒度 不能直接使用在方法上。</p>
 <pre><code class="java"> public static  LazySingleton getInstance()&#123;
         if(SINGLETEN==null)&#123;//语句1
             synchronized (LazySingleton.class)&#123;//语句2
@@ -254,7 +254,7 @@ public class LazySingleton &#123;
 </code></pre>
 <p>把粒度缩小到创建对象上 那么这样写有没有问题呢？</p>
 <p>当第一次执行的时候 ，线程一和线程二同时来到语句1，判断为空执行语句2的时候 ，虽然加了synchronized</p>
-<p>但也只是让同一时刻 ，有一个线程创建对象而已，线程一创建完成以后 释放锁  线程二拿到锁 继续执行对象。</p>
+<p>但也只是让同一时刻 ，有一个线程创建对象而已，线程一创建完成以后 释放锁  线程二拿到锁 继续创建对象。</p>
 <p>那么问题就出现在线程二语句2 的时候，不能直接创建 而应该再次判断对象是否为空。</p>
 <pre><code class="java"> public static  LazySingleton getInstance()&#123;
         if(SINGLETEN==null)&#123;//语句1
