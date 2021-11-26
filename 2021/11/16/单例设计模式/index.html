@@ -319,7 +319,7 @@ public class StaticInnerClassSingleton &#123;
 <p>所以就不会出现上面这种情况，一个线程发生重排序 还没执行完2的时候 ，被另一个看到已经有指向的地址，从而来判断不为空 直接返回 然后在外界使用还没有初始化完成的对象。 </p>
 <h5 id="静态内部类优缺点："><a href="#静态内部类优缺点：" class="headerlink" title="静态内部类优缺点："></a>静态内部类优缺点：</h5><p>优点：也实现延迟加载 也能保证线程的安全。</p>
 <p>缺点：实现起来还要额外写一个内部类。</p>
-<h3 id="容器实现法："><a href="#容器实现法：" class="headerlink" title="容器实现法："></a>容器实现法：</h3><p>利用ConcurrentHashMap来实现单例</p>
+<h3 id="容器单例法："><a href="#容器单例法：" class="headerlink" title="容器单例法："></a>容器单例法：</h3><p>spring单例Bean也是利用容器实现，我们可以利用ConcurrentHashMap来实现单例</p>
 <pre><code class="java">/**
  * @Author：小球某
  * @Date：2021/11/17/1:54
@@ -339,31 +339,34 @@ public class ContainerSingleton &#123;
 &#125;
 </code></pre>
 <p>通过使用ConcurrentHashMap的computeIfAbsent方法实现，能够实现原子性的操作，从而达到多线程的安全。</p>
-<h5 id="容器实现法优缺点："><a href="#容器实现法优缺点：" class="headerlink" title="容器实现法优缺点："></a>容器实现法优缺点：</h5><p>优点：也实现延迟加载 也能保证线程的安全。</p>
+<h5 id="容器单例优缺点："><a href="#容器单例优缺点：" class="headerlink" title="容器单例优缺点："></a>容器单例优缺点：</h5><p>优点：也实现延迟加载 也能保证线程的安全。</p>
 <p>缺点：还需要额外使用容器来存储对象，浪费了一定的内存。</p>
-<h3 id="枚举法："><a href="#枚举法：" class="headerlink" title="枚举法："></a>枚举法：</h3><p>利用枚举来实现单例</p>
+<h3 id="枚举单例："><a href="#枚举单例：" class="headerlink" title="枚举单例："></a>枚举单例：</h3><p>利用枚举来实现单例</p>
 <pre><code class="java">/**
  * @Author：球某
  * @Date：2021/11/17/1:59
  * 枚举法
  */
-public enum EnumSingleton &#123;
+public enum EnumSingleton  &#123;
     INSTANCE;
-    private DbConnect dbConnect;
+    private Object data;
 
     private EnumSingleton()&#123;
-        dbConnect=new DbConnect();
+        data=new Object();
     &#125;
 
-    public static DbConnect getInstance()&#123;
-        return INSTANCE.dbConnect;
+    public static EnumSingleton getInstance()&#123;
+        return INSTANCE;
     &#125;
 
-    private class DbConnect&#123;&#125; //模拟一个数据库连接对象
+    public Object getData()&#123;
+        return data;
+    &#125;
+
 &#125;
 </code></pre>
 <p>Java规范字规定，每个枚举类型及其定义的枚举变量在JVM中都是唯一的，因此在枚举类型的序列化和反序列化上，Java做了特殊的规定。在序列化的时候Java仅仅是将枚举对象的name属性输到结果中，反序列化的时候则是通过java.lang.Enum的valueOf()方法来根据名字查找枚举对象。也就是说，序列化的时候只将DATASOURCE这个名称输出，反序列化的时候再通过这个名称，查找对应的枚举类型，因此反序列化后的实例也会和之前被序列化的对象实例相同。</p>
-<h5 id="枚举法优缺点："><a href="#枚举法优缺点：" class="headerlink" title="枚举法优缺点："></a>枚举法优缺点：</h5><p>优点：写法简单高效，天然的防止反序列化和反射。</p>
+<h5 id="枚举单例优缺点："><a href="#枚举单例优缺点：" class="headerlink" title="枚举单例优缺点："></a>枚举单例优缺点：</h5><p>优点：写法简单高效，天然的防止反序列化和反射。</p>
 <p>缺点：在我看来没有缺点。</p>
 <h5 id="总结：各种写法都有自己的优缺点，面试问的比较多就是DCL双检查锁机制-最实用的也是就是枚举，当然关于单例的序列化和反射破坏-留到下一篇来讲。"><a href="#总结：各种写法都有自己的优缺点，面试问的比较多就是DCL双检查锁机制-最实用的也是就是枚举，当然关于单例的序列化和反射破坏-留到下一篇来讲。" class="headerlink" title="总结：各种写法都有自己的优缺点，面试问的比较多就是DCL双检查锁机制  最实用的也是就是枚举，当然关于单例的序列化和反射破坏 留到下一篇来讲。"></a>总结：各种写法都有自己的优缺点，面试问的比较多就是DCL双检查锁机制  最实用的也是就是枚举，当然关于单例的序列化和反射破坏 留到下一篇来讲。</h5><p><a class="link"   target="_blank" rel="noopener" href="https://github.com/huangjie-qq/Singleton" >代码地址<i class="fas fa-external-link-alt"></i></a></p>
 
@@ -373,6 +376,21 @@ public enum EnumSingleton &#123;
 
         
             <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2021/11/25/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">破坏单例</span>
+                                <span class="post-nav-item">上一篇</span>
+                            </span>
+                        </a>
+                    </div>
                 
                 
                     <div class="article-next">

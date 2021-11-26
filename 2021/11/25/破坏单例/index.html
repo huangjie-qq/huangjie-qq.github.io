@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="Hexo Theme Keep">
+    <meta name="author" content="小球某">
+    
+    <title>
+        
+            破坏单例 |
+        
+        小球某的博客
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/itang.svg">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"example.com","root":"/","language":"zh-CN","path":"search.json"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/itang.svg","favicon":"/images/itang.svg","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":true,"background_img":"/images/bg.svg","description":"会一点java又爱偷吃的猫"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":true}}},"local_search":{"enable":true,"preload":true},"code_copy":{"enable":true,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.3"};
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 月前","year":"%s 年前"};
+  </script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+        <span class="scroll-progress-bar"></span>
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                小球某的博客
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                首页
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                文章
+                            </a>
+                        </li>
+                    
+                    
+                        <li class="menu-item search search-popup-trigger">
+                            <i class="fas fa-search"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fas fa-search"></i></div>
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">首页</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">文章</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">破坏单例</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/itang.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">小球某</span>
+                        
+                            <span class="author-label">铲屎官</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;2021-11-25 23:25:27
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fas fa-file-word"></i>&nbsp;<span>2.9k 字</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fas fa-clock"></i>&nbsp;<span>12 分钟</span>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fas fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h1 id="破坏单例"><a href="#破坏单例" class="headerlink" title="破坏单例"></a>破坏单例</h1><p>怎么破坏单例呢？</p>
+<p>可以从反序列化和反射来破坏。</p>
+<p>对于<a class="link"   target="_blank" rel="noopener" href="https://huangjie-qq.github.io/2021/11/16/%E5%8D%95%E4%BE%8B%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" >上一篇<i class="fas fa-external-link-alt"></i></a>讲的五种写法，我们分别来破坏，看看是个什么情况。</p>
+<h4 id="饿汉式："><a href="#饿汉式：" class="headerlink" title="饿汉式："></a>饿汉式：</h4><h5 id="反序列化攻击：饿汉式"><a href="#反序列化攻击：饿汉式" class="headerlink" title="反序列化攻击：饿汉式"></a>反序列化攻击：饿汉式</h5><pre><code class="java">public static void main(String[] args) throws Exception&#123;
+        HungrySingleton instance = HungrySingleton.getInstance();
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;instance_file&quot;));
+        oos.writeObject(instance);
+
+        File file = new File(&quot;instance_file&quot;);
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        HungrySingleton readObject = (HungrySingleton)ois.readObject();
+
+        System.out.println(instance);
+        System.out.println(readObject);
+        System.out.println(instance==readObject);
+    &#125;
+</code></pre>
+<p>运行结果：</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/1.png" alt="avatar"></p>
+<p>经过了序列化和反序列化之后 ，饿汉式就产生了两个对象 ，很显然这样就违背了单例设计的原则。 </p>
+<p>那么怎么解决反序列化攻击呢？</p>
+<p>在HungrySingleton中编写一个readResolve()方法代码如下</p>
+<pre><code class="java">/**
+ * @Author：小球某
+ * @Date：2021/11/16/23:47
+ * 饿汉式
+ */
+public class HungrySingleton implements Serializable &#123;
+    private HungrySingleton()&#123;&#125;;
+
+    private static final HungrySingleton SINGLETON=new HungrySingleton();
+
+    public static HungrySingleton getInstance()&#123;
+       return SINGLETON;
+    &#125;
+
+    /**
+     * 防止反序列化
+     * @return
+     */
+    private Object readResolve()&#123;
+        return SINGLETON;
+    &#125;
+&#125;
+</code></pre>
+<p>然后重新运行：</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/0.png" alt="avatar"></p>
+<p>为什么我们提供了一个readResolve()方法就能保证安全呢？</p>
+<p>从readObject()方法入手分析。</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/2.png" alt="avatar"></p>
+<p>进到 readObject0方法中</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/3.png" alt="avatar"></p>
+<p>继续进到 readOrdinaryObject(unshared)方法中</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/4.png" alt="avatar"></p>
+<p>继续进到 desc.isInstantiable()方法中</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/5.png" alt="avatar"></p>
+<p>isInstantiable()方法中的注释讲，如果表示的类是可序列化/可外部化的并且可以由序列化运行时实例化，则返回 true  。</p>
+<p>那么2011行代码的 desc.isInstantiable()返回true  ，根据三目运算符，就会执行 desc.newInstance()方法。</p>
+<p>继续进到newInstance()方法</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/-1.png" alt="avatar"></p>
+<p>在这里最主要的一句是 cons.newInstance();</p>
+<p>那我们看看 cons是个什么</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/-2.png" alt="avatar"></p>
+<p>原是一个构造器，所以cons.newInstance(); 就是用反射创建了一个对象。</p>
+<p>所以在这里也解释了为什么会破坏单例 它是用反射new了个新对象。</p>
+<p>这样一来2009行的 obj对象就不为空。我们继续往readOrdinaryObject()方法往下看</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/6.png" alt="avatar"></p>
+<p>来到2032行，因为obj不为空 所以会执行到 2033行的handles.lookupException(passHandle)方法</p>
+<p>我们先来看 传递的参数passHandle等于什么。</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/7.png" alt="avatar"></p>
+<p>然后继续进到lookupException()方法中去</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/8.png" alt="avatar"></p>
+<p>lookupException()方法中的注释也说得很清楚了， 如果给定的句柄是 NULL_HANDLE，或者没有与句柄关联的 ClassNotFoundException，则返回 null。</p>
+<p>所以2033行中的 handles.lookupException(passHandle) == null 为true 。</p>
+<p>会继续执行2034行的desc.hasReadResolveMethod()方法，继续跟进去。</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/9.png" alt="avatar"></p>
+<p>hasReadResolveMethod方法的注释也说得很明白了，定义了一致的 readResolve 方法，则返回 true。</p>
+<p>因为我们写了一个readResolve 方法，所以整个表达式的结果为true ，进入if。</p>
+<p>执行2036行的Object rep = desc.invokeReadResolve(obj)代码。</p>
+<p>继续进到 invokeReadResolve(obj)方法中</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/10.png" alt="avatar"></p>
+<p>invokeReadResolve方法的注释说，readResolve 方法并返回结果。</p>
+<p>我们在HungrySingleton中的代码是返回单例对象</p>
+<pre><code class="java"> /**
+     * 防止反序列化
+     * @return
+     */
+    private Object readResolve()&#123;
+        return SINGLETON;
+    &#125;
+</code></pre>
+<p>所以在2036行代码中的rep 等于我们的单例对象。</p>
+<p>继续往下看</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/11.png" alt="avatar"></p>
+<p>来到2040行代码， rep是单例对象  obj是反射的对象 自然不会相等 进入if，最终将obj指向单例对象 并返回出去。</p>
+<p>所以这就是为什么写一个readResolve()方法就能防止反序列化攻击了。</p>
+<p>小结：readObject()方法会检查类中有没有readResolve()方法，如果有则调用，这样我们就可以在readResolve()方法中添加我们的逻辑 ，从而达到单例的安全。</p>
+<p>反序列化攻击看完了，我们继续来看反射攻击。</p>
+<h5 id="反射攻击：饿汉式"><a href="#反射攻击：饿汉式" class="headerlink" title="反射攻击：饿汉式"></a>反射攻击：饿汉式</h5><pre><code class="java"> public static void main(String[] args) throws Exception&#123;
+
+        HungrySingleton instance = HungrySingleton.getInstance();
+
+        Class&lt;HungrySingleton&gt; aClass = HungrySingleton.class;
+        Constructor&lt;HungrySingleton&gt; constructor = aClass.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        HungrySingleton newInstance = constructor.newInstance(null);
+
+        System.out.println(instance);
+        System.out.println(newInstance);
+        System.out.println(instance==newInstance);
+    &#125;
+</code></pre>
+<p>运行结果：</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/12.png" alt="avatar"></p>
+<p>通过反射 打开私有构造器权限，就可以new出新的对象，从而破坏单例。</p>
+<p>那么怎么解决呢？</p>
+<pre><code class="java">private HungrySingleton()&#123;
+      if(SINGLETON!=null)
+        throw new RuntimeException(&quot;单例构造器 禁止反射破坏&quot;);
+ &#125;;
+</code></pre>
+<p>在私有构造函数中判断，禁止new出对象。</p>
+<p>因为饿汉式是在类加载阶段时候创建的，在反射代码调用时就已经存在，就会抛出异常。</p>
+<p>从而不会new出两次，达到防止反射安全。</p>
+<h4 id="静态内部类："><a href="#静态内部类：" class="headerlink" title="静态内部类："></a>静态内部类：</h4><h5 id="反序列化攻击：静态内部类"><a href="#反序列化攻击：静态内部类" class="headerlink" title="反序列化攻击：静态内部类"></a>反序列化攻击：静态内部类</h5><pre><code class="java"> public static void main(String[] args) throws Exception&#123;
+
+        StaticInnerClassSingleton instance = StaticInnerClassSingleton.getInstance();
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;instance_file&quot;));
+        oos.writeObject(instance);
+
+        File file = new File(&quot;instance_file&quot;);
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        StaticInnerClassSingleton readObject = (StaticInnerClassSingleton)ois.readObject();
+
+        System.out.println(instance);
+        System.out.println(readObject);
+        System.out.println(instance==readObject);
+    &#125;
+</code></pre>
+<p>结果和上面饿汉式表现一样，会被破坏，需要编写一个readResolve()方法代码，才能反序列化安全。</p>
+<pre><code class="java">/**
+ * @Author：球某
+ * @Date：2021/11/17/1:44
+ * 静态内部类
+ */
+public class StaticInnerClassSingleton implements Serializable &#123;
+
+    private StaticInnerClassSingleton()&#123;&#125;
+
+    private static class InnerClass&#123;
+       private static StaticInnerClassSingleton singleton=new StaticInnerClassSingleton();
+    &#125;
+
+    public static StaticInnerClassSingleton getInstance()&#123;
+        return InnerClass.singleton;
+    &#125;
+
+    /**
+     * 防止反序列化
+     * @return
+     */
+    private Object readResolve()&#123;
+        return InnerClass.singleton;
+    &#125;
+&#125;
+</code></pre>
+<h5 id="反射攻击：静态内部类"><a href="#反射攻击：静态内部类" class="headerlink" title="反射攻击：静态内部类"></a>反射攻击：静态内部类</h5><pre><code class="java"> public static void main(String[] args) throws Exception&#123;
+
+        StaticInnerClassSingleton instance = StaticInnerClassSingleton.getInstance();
+
+        Class&lt;StaticInnerClassSingleton&gt; aClass = StaticInnerClassSingleton.class;
+        Constructor&lt;StaticInnerClassSingleton&gt; constructor = aClass.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        StaticInnerClassSingleton newInstance = constructor.newInstance(null);
+
+        System.out.println(instance);
+        System.out.println(newInstance);
+        System.out.println(instance==newInstance);
+    &#125;
+</code></pre>
+<p>表现结果还是和上面饿汉式，也防御不了反射攻击，也需要在构造函数中判断。</p>
+<pre><code>/**
+ * @Author：球某
+ * @Date：2021/11/17/1:44
+ * 静态内部类
+ */
+public class StaticInnerClassSingleton implements Serializable &#123;
+
+    private StaticInnerClassSingleton()&#123;
+        if(InnerClass.singleton!=null)
+            throw new RuntimeException(&quot;单例构造器 禁止反射破坏&quot;);
+    &#125;
+
+    private static class InnerClass&#123;
+       private static StaticInnerClassSingleton singleton=new StaticInnerClassSingleton();
+    &#125;
+
+    public static StaticInnerClassSingleton getInstance()&#123;
+        return InnerClass.singleton;
+    &#125;
+
+    /**
+     * 防止反序列化
+     * @return
+     */
+    private Object readResolve()&#123;
+        return InnerClass.singleton;
+    &#125;
+&#125;
+</code></pre>
+<p>因为静态内部类，也是在使用是才加载，所以也能保证反射的安全。</p>
+<h4 id="懒汉式："><a href="#懒汉式：" class="headerlink" title="懒汉式："></a>懒汉式：</h4><h5 id="序列化攻击：懒汉式"><a href="#序列化攻击：懒汉式" class="headerlink" title="序列化攻击：懒汉式"></a>序列化攻击：懒汉式</h5><pre><code class="java">public static void main(String[] args) throws Exception&#123;
+
+        LazySingleton instance = LazySingleton.getInstance();
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;instance_file&quot;));
+        oos.writeObject(instance);
+
+        File file = new File(&quot;instance_file&quot;);
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        LazySingleton readObject = (LazySingleton)ois.readObject();
+
+        System.out.println(instance);
+        System.out.println(readObject);
+        System.out.println(instance==readObject);
+    &#125;
+</code></pre>
+<p>结果和上面都是一样，防御不了序列化攻击，也是要提供readResolve()方法。</p>
+<pre><code class="java">/**
+ * @Author：小球某
+ * @Date：2021/11/16/23:56
+ * 懒汉式
+ */
+public class LazySingleton implements Serializable &#123;
+    private LazySingleton()&#123;&#125;;
+
+    private static volatile LazySingleton SINGLETEN;
+
+    public static LazySingleton getInstance()&#123;
+        if(SINGLETEN==null)&#123;//语句1
+            synchronized (LazySingleton.class)&#123;//语句2
+                if(SINGLETEN==null)&#123;
+                    SINGLETEN=new LazySingleton();
+                &#125;
+            &#125;
+        &#125;
+        return SINGLETEN;
+    &#125;
+
+    /**
+     * 防止反序列化
+     * @return
+     */
+    private Object readResolve()&#123;
+        return SINGLETEN;
+    &#125;
+&#125;
+</code></pre>
+<h5 id="反射攻击：懒汉式"><a href="#反射攻击：懒汉式" class="headerlink" title="反射攻击：懒汉式"></a>反射攻击：懒汉式</h5><pre><code class="java"> public static void main(String[] args) throws Exception&#123;
+
+        LazySingleton instance = LazySingleton.getInstance();
+
+        Class&lt;LazySingleton&gt; aClass = LazySingleton.class;
+        Constructor&lt;LazySingleton&gt; constructor = aClass.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        LazySingleton newInstance = constructor.newInstance(null);
+
+        System.out.println(instance);
+        System.out.println(newInstance);
+        System.out.println(instance==newInstance);
+    &#125;
+</code></pre>
+<p>结果也是一样 不能防御反射的攻击，那么我们继续在构造函数中继续判断。</p>
+<pre><code class="java">/**
+ * @Author：小球某
+ * @Date：2021/11/16/23:56
+ * 懒汉式
+ */
+public class LazySingleton implements Serializable &#123;
+
+    private LazySingleton()&#123;
+        if(SINGLETEN!=null)
+            throw new RuntimeException(&quot;单例构造器 禁止反射破坏&quot;);
+    &#125;;
+
+    private static volatile LazySingleton SINGLETEN;
+
+    public static LazySingleton getInstance()&#123;
+        if(SINGLETEN==null)&#123;//语句1
+            synchronized (LazySingleton.class)&#123;//语句2
+                if(SINGLETEN==null)&#123;
+                    SINGLETEN=new LazySingleton();
+                &#125;
+            &#125;
+        &#125;
+        return SINGLETEN;
+    &#125;
+
+    /**
+     * 防止反序列化
+     * @return
+     */
+    private Object readResolve()&#123;
+        return SINGLETEN;
+    &#125;
+&#125;
+</code></pre>
+<p>继续运行：</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/13.png" alt="avatar"></p>
+<p>结果也达到了我们预期，可是这样真的没用问题了吗。</p>
+<p>我们换个思路，让反射的代码先执行，getInstance()方法后执行试试。</p>
+<pre><code class="java"> public static void main(String[] args) throws Exception&#123;
+        //反射先执行
+        Class&lt;LazySingleton&gt; aClass = LazySingleton.class;
+        Constructor&lt;LazySingleton&gt; constructor = aClass.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        LazySingleton newInstance = constructor.newInstance(null);
+
+        LazySingleton instance = LazySingleton.getInstance();
+        System.out.println(instance);
+        System.out.println(newInstance);
+        System.out.println(instance==newInstance);
+    &#125;
+</code></pre>
+<p>运行结果：</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/14.png" alt="avatar"></p>
+<p>结果反射又再次破坏了我们的单例，那么有没有什么办法呢。</p>
+<p>主要是在构造函数里面做判断，其实不管怎么做判断，反射都可以通过打开私有权限 去破坏。</p>
+<p>因为懒汉式最大的特点就是延迟加载，只有用到时候才会加载，那么只要在加载前 执行反射代码的话 就是避免不了被破坏的。所以我们能做的就是尽量的让反射的代码后执行 ，在多线程下 加载的代码 和反射代码是不同线程执行，那么我们就无法避免。</p>
+<p>上面的饿汉式是加载类阶段的时候就会创建出，即使先反射代码先执行，反射也会触发类的加载，从而完成创建，</p>
+<p>在newInstance的时候也就会报错。而静态内部类是由JVM保证的安全。</p>
+<p>小结：懒汉式只能防御反序列化攻击，不能完全防御反射攻击。</p>
+<h4 id="容器单例："><a href="#容器单例：" class="headerlink" title="容器单例："></a>容器单例：</h4><h5 id="反序列化攻击：容器单例"><a href="#反序列化攻击：容器单例" class="headerlink" title="反序列化攻击：容器单例"></a>反序列化攻击：容器单例</h5><pre><code class="java"> public static void main(String[] args) throws Exception&#123;
+
+        ContainerSingleton instance = ContainerSingleton.getInstance();
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;instance_file&quot;));
+        oos.writeObject(instance);
+
+        File file = new File(&quot;instance_file&quot;);
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        ContainerSingleton readObject = (ContainerSingleton)ois.readObject();
+
+        System.out.println(instance);
+        System.out.println(readObject);
+        System.out.println(instance==readObject);
+    &#125;
+</code></pre>
+<p>也是和大家一样，防御不了序列化攻击，也是要提供readResolve()方法。</p>
+<pre><code class="java">/**
+ * @Author：小球某
+ * @Date：2021/11/17/1:54
+ * 容器实现法
+ */
+public class ContainerSingleton  implements Serializable &#123;
+    private ContainerSingleton()&#123;&#125;;
+
+    private static ConcurrentHashMap&lt;String, ContainerSingleton&gt; map=new ConcurrentHashMap();
+
+    private static String KEY=&quot;singleten&quot;;
+
+    public static ContainerSingleton getInstance()&#123;
+        ContainerSingleton singleten = map.get(KEY);
+        return singleten!=null?singleten:map.computeIfAbsent(KEY,s-&gt; new ContainerSingleton());
+    &#125;
+
+    /**
+     * 防止反序列化
+     * @return
+     */
+    private Object readResolve()&#123;
+        return map.get(KEY);
+    &#125;
+&#125;
+</code></pre>
+<h5 id="反射攻击：容器单例-给构造函数中添加判断-并让反射代码先执行"><a href="#反射攻击：容器单例-给构造函数中添加判断-并让反射代码先执行" class="headerlink" title="反射攻击：容器单例 给构造函数中添加判断 并让反射代码先执行"></a>反射攻击：容器单例 给构造函数中添加判断 并让反射代码先执行</h5><pre><code class="java">private ContainerSingleton()&#123;
+    if(map.get(KEY)!=null)
+      throw new RuntimeException(&quot;单例构造器 禁止反射破坏&quot;);
+ &#125;;
+</code></pre>
+<pre><code class="java"> public static void main(String[] args) throws Exception&#123;
+        //反射先执行
+        Class&lt;ContainerSingleton&gt; aClass = ContainerSingleton.class;
+        Constructor&lt;ContainerSingleton&gt; constructor = aClass.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        ContainerSingleton newInstance = constructor.newInstance(null);
+
+        ContainerSingleton instance = ContainerSingleton.getInstance();
+        System.out.println(instance);
+        System.out.println(newInstance);
+        System.out.println(instance==newInstance);
+    &#125;
+</code></pre>
+<p>表现结果也是和懒汉式一样，只能防御住 反射后执行的情况，如果反射先执行就防御不了。</p>
+<h4 id="枚举单例："><a href="#枚举单例：" class="headerlink" title="枚举单例："></a>枚举单例：</h4><h5 id="反序列攻击：枚举单例"><a href="#反序列攻击：枚举单例" class="headerlink" title="反序列攻击：枚举单例"></a>反序列攻击：枚举单例</h5><pre><code class="java"> public static void main(String[] args) throws Exception&#123;
+        
+        EnumSingleton instance = EnumSingleton.getInstance();
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(&quot;instance_file&quot;));
+        oos.writeObject(instance);
+
+        File file = new File(&quot;instance_file&quot;);
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+        EnumSingleton readObject =(EnumSingleton) ois.readObject();
+
+        System.out.println(instance.getData());
+        System.out.println(readObject.getData());
+        System.out.println(instance.getData()==readObject.getData());
+
+    &#125;
+</code></pre>
+<p>运行结果：</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/15.png" alt="avatar"></p>
+<h5 id="反射攻击：枚举单例"><a href="#反射攻击：枚举单例" class="headerlink" title="反射攻击：枚举单例"></a>反射攻击：枚举单例</h5><pre><code class="java">public static void main(String[] args) throws Exception&#123;
+        //反射先执行
+        Class&lt;EnumSingleton&gt; aClass = EnumSingleton.class;
+        Constructor&lt;EnumSingleton&gt; constructor = aClass.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        EnumSingleton newInstance = constructor.newInstance(null);
+
+        EnumSingleton instance = EnumSingleton.getInstance();
+        System.out.println(instance);
+        System.out.println(newInstance);
+        System.out.println(instance==newInstance);
+
+    &#125;
+</code></pre>
+<p>运行结果：</p>
+<p><img src="https://my-xqm-srb.oss-cn-hangzhou.aliyuncs.com/%E5%8D%9A%E5%AE%A2/%E7%A0%B4%E5%9D%8F%E5%8D%95%E4%BE%8B/16.png" alt="avatar"></p>
+<p>Java规范字规定，每个枚举类型及其定义的枚举变量在JVM中都是唯一的，因此在枚举类型的序列化和反序列化上，Java做了特殊的规定。在序列化的时候Java仅仅是将枚举对象的name属性输到结果中，反序列化的时候则是通过java.lang.Enum的valueOf()方法来根据名字查找枚举对象。也就是说，序列化的时候只将DATASOURCE这个名称输出，反序列化的时候再通过这个名称，查找对应的枚举类型，因此反序列化后的实例也会和之前被序列化的对象实例相同。</p>
+<h5 id="总结：枚举单例-天然的防御反序列化和反射攻击，饿汉式和静态内部类也可以防御-需要提供readResolve-方法和对构造函数判断，懒汉式和容器单例-可以防御反序列化攻击，但不能完全防御反射攻击。"><a href="#总结：枚举单例-天然的防御反序列化和反射攻击，饿汉式和静态内部类也可以防御-需要提供readResolve-方法和对构造函数判断，懒汉式和容器单例-可以防御反序列化攻击，但不能完全防御反射攻击。" class="headerlink" title="总结：枚举单例 天然的防御反序列化和反射攻击，饿汉式和静态内部类也可以防御 需要提供readResolve()方法和对构造函数判断，懒汉式和容器单例 可以防御反序列化攻击，但不能完全防御反射攻击。"></a>总结：枚举单例 天然的防御反序列化和反射攻击，饿汉式和静态内部类也可以防御 需要提供readResolve()方法和对构造函数判断，懒汉式和容器单例 可以防御反序列化攻击，但不能完全防御反射攻击。</h5><p><a class="link"   target="_blank" rel="noopener" href="https://github.com/huangjie-qq/Singleton" >代码地址<i class="fas fa-external-link-alt"></i></a></p>
+
+        </div>
+
+        
+
+        
+            <div class="article-nav">
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2021/11/16/%E5%8D%95%E4%BE%8B%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">单例的五种实现</span>
+                                <span class="post-nav-item">下一篇</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+            <div class="comment-container">
+                <div class="comments-container">
+    <div id="comment-anchor"></div>
+    <div class="comment-area-title">
+        <i class="fas fa-comments">&nbsp;评论</i>
+    </div>
+    
+
+        
+            
+    <div class="valine-container">
+        <script 
+                src="//cdn.jsdelivr.net/npm/valine@latest/dist/Valine.min.js"></script>
+        <div id="vcomments"></div>
+        <script >
+            function loadValine() {
+                new Valine({
+                    el: '#vcomments',
+                    appId: '7nVegzByflMPenl1NTSoUmDj-gzGzoHsz',
+                    appKey: 'YxcFTbLd95Y2xVFTnL9HwcFL',
+                    meta: ['nick', 'mail', 'link'],
+                    avatar: 'wavatar',
+                    enableQQ: true,
+                    placeholder: '😜 尽情吐槽吧~',
+                    lang: 'zh-CN'.toLowerCase()
+                });
+
+                function getAuthor(language) {
+                    switch (language) {
+                        case 'en':
+                            return 'Author';
+                        case 'zh-CN':
+                            return '博主';
+                        default:
+                            return 'Master';
+                    }
+                }
+
+                // Add "Author" identify
+                const getValineDomTimer = setInterval(() => {
+                    const vcards = document.querySelectorAll('#vcomments .vcards .vcard');
+                    if (vcards.length > 0) {
+                        let author = '小球某';
+
+                        if (author) {
+                            for (let vcard of vcards) {
+                                const vnick_dom = vcard.querySelector('.vhead .vnick');
+                                const vnick = vnick_dom.innerHTML;
+                                if (vnick === author) {
+                                    vnick_dom.innerHTML = `${vnick} <span class="author">${getAuthor(KEEP.hexo_config.language)}</span>`
+                                }
+                            }
+                        }
+                        clearInterval(getValineDomTimer);
+                    } else {
+                        clearInterval(getValineDomTimer);
+                    }
+                }, 2000);
+            }
+
+            if ('false') {
+                const loadValineTimeout = setTimeout(() => {
+                    loadValine();
+                    clearTimeout(loadValineTimeout);
+                }, 1000);
+            } else {
+                window.addEventListener('DOMContentLoaded', loadValine);
+            }
+        </script>
+    </div>
+
+
+
+        
+    
+</div>
+
+            </div>
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2021&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">小球某</a>
+        </div>
+        
+            <script async  src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv">
+                        访问人数&nbsp;<span id="busuanzi_value_site_uv"></span>&ensp;
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv">
+                        总访问量&nbsp;<span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="theme-info info-item">
+            由 <a target="_blank" href="https://hexo.io">Hexo</a> 驱动&nbsp;|&nbsp;主题&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.3</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+            <li class="go-comment">
+                <i class="fas fa-comment"></i>
+            </li>
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="arrow-up fas fa-arrow-up"></i>
+                <span class="percent"></span>
+            </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+        <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-input-field-pre">
+            <i class="fas fa-keyboard"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="搜索..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="popup-btn-close">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fas fa-spinner fa-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+    
+<script src="/js/local-search.js"></script>
+
+
+
+
+    
+<script src="/js/code-copy.js"></script>
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>
